@@ -1,0 +1,133 @@
+<div class="windows-container">
+    <div class="window search">
+        <h3 class="input-group">
+            <button class="input-group-text material-icons">search</button>
+            <input type="text" class="form-control" placeholder="Поиск">
+        </h3>
+        <hr size>
+        <div class="results"></div>
+    </div>
+    <div class="window config">
+        <h3><i class="material-icons">settings</i> Настройки</h3>
+        <hr size>
+        <div class="conf-block">
+            <h5><i class="material-icons">brush</i>Внешний вид</h5>
+            <div>
+                <div class="el-switch">
+                    <input type="checkbox" id="el-9018834">
+                    <label for="el-9018834"></label>
+                </div>
+                Показывать локальное время на сайте
+            </div>
+            <div>
+                <div class="color-picker">
+                    <input type='color' value="#4E4E4E" onchange="document.documentElement.style.setProperty('--brand-gray', toRGB(this.value));">
+                    Тёмный цвет
+                </div>
+            </div>
+            <div>
+                <div class="color-picker">
+                    <input type='color' value="#f0f0f0" onchange="document.documentElement.style.setProperty('--brand-white', toRGB(this.value));">
+                    Светлый цвет
+                </div>
+            </div>
+            <div>
+                <div class="color-picker">
+                    <input type='color' value="#000" onchange="document.documentElement.style.setProperty('--g-color', toRGB(this.value));">
+                    Цвет текста
+                </div>
+            </div>
+            <div class="conf-mode-preview">
+                Режим просмотра аниме:<br/>
+                <select class="form-select" onchange="this.dataset.chosen=this.value;" data-chosen="0">
+                    <option value="0" selected>Кинотеарт</option>
+                    <option value="1">На весь экран</option>
+                    <option value="2">В окне</option>
+                </select>
+                <div class="preview">
+                    <div class="video">
+
+                    </div>
+                </div>
+            </div>
+            <div class="border border-danger rounded p-2 dev-option">
+                <div>
+                    <div class="el-switch">
+                        <input type="checkbox" id="el-0973523">
+                        <label for="el-0973523"></label>
+                    </div>
+                    Режим повышеных эффектов
+                </div>
+                <span class="transparent description-l">Режим повышеных эффектов может негативно влиять на самочувствие. Если при использовании этого режима у вас ухудшилось самочувствие, пожалуйста отключите его.</span>
+            </div>
+        </div>
+        <div class="conf-block">
+            <h5><i class="material-icons">search</i>Настройки результатов</h5>
+            <div class="border rounded p-2">
+                <div>
+                    <div class="el-switch">
+                        <input type="checkbox" id="el-9834552">
+                        <label for="el-9834552"></label>
+                    </div>
+                    Поиск в реальном времени
+                </div>
+                <span class="description-l transparent">Поиск будет производиться по мере набора текста</span>
+            </div>
+            <div class="input-group mb-3">
+                <span class="input-group-text">Кол-во загружаемых тайтлов</span>
+                <input type="number" class="form-control" placeholder="50" min="10" max="50" value="50" step="1">
+            </div>
+            <div class="input-group mb-3">
+                <span class="input-group-text">Сортировать по</span>
+                <select class="form-select">
+                    <option value="id">ID</option>
+                    <option value="ranked" selected>Рангу</option>
+                    <option value="kind">Типу</option>
+                    <option value="popularity">Популярности</option>
+                    <option value="name">Названию</option>
+                    <option value="aired_on">Дате выхода</option>
+                    <option value="episodes">Эпизодам</option>
+                    <option value="status">Статусу</option>
+                    <option value="random">Случайности</option>
+                </select>
+            </div>
+            <div class="border border-danger rounded p-2 transparent">
+                <div>
+                    <div class="el-switch">
+                        <input type="checkbox" id="el-4875224">
+                        <label for="el-4875224"></label>
+                    </div>
+                    Показывать RX тайтлы
+                </div>
+                <span class="description-l">RX rating - Hentai (extreme sexual content/nudity). Не все аниме тайтлы RX рейтинга могут быть доступны.</span>
+            </div>
+            <div class="input-group mb-3">
+                <span class="input-group-text">API поиска</span>
+                <select class="form-select">
+                    <option value="shikimori" selected>Shikimori</option>
+                    <option value="kodik" disabled>Kodik</option>
+                </select>
+            </div>
+            <button onclick="App.install(App.DEFAULT_MANIFEST,true)">Принудительно обновить</button>
+            <button onclick="App.checkUpdate()">Проверить обновления</button>
+        </div>
+
+    </div>
+    <div class="window history">
+        <h3><i class="material-icons">history</i> История просмотра</h3>
+        <hr size>
+    </div>
+    <div class="window favorite">
+        <h3><i class="material-icons">favorite</i> Любимое</h3>
+        <hr size>
+    </div>
+    <div class="window player cinema"></div>
+    <div class="window title-info">
+        <h3>$TITLE NAME</h3>
+        <hr size>
+    </div>
+    <div class="window about">
+        <h3><i class="material-icons">info</i> О сайте</h3>
+        <hr size>
+    </div>
+</div>

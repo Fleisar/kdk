@@ -1,0 +1,76 @@
+{
+  "dev_mode": 1,
+  "short_name": "KDK",
+  "name": "KDK Player",
+  "logo": "app/logo.svg",
+  "icon": ["app/logo.ico","icon"],
+  "load_type": "default",
+  "update": {
+    "release": 0,
+    "type": "dev",
+    "version": "3.0-beta",
+    "description": ""
+  },
+  "update_policy": {
+    "auto": true
+  },
+  "sources": [
+    {
+      "url": "https://fonts.googleapis.com/css2?family=Roboto&display=swap",
+      "type": "style"
+    },
+    {
+      "url": "https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css",
+      "type": "style"
+    },
+    {
+      "url": "https://fonts.googleapis.com/icon?family=Material+Icons",
+      "type": "style"
+    },
+    {
+      "url": "app/index.html",
+      "type": "html"
+    },
+    {
+      "url": "app/windows.html",
+      "type": "html"
+    },
+    {
+      "url": "app/global.css",
+      "type": "style"
+    },
+    {
+      "url": "app/index.css",
+      "type": "style"
+    },
+    {
+      "url": "https://code.jquery.com/jquery-3.5.1.min.js",
+      "type": "script"
+    },
+    {
+      "url": "app/bind.addon.js",
+      "type": "script"
+    },
+    {
+      "url": "https://cdn.jsdelivr.net/npm/vanilla-lazyload@17.3.0/dist/lazyload.min.js",
+      "type": "script"
+    },
+    {
+      "url": "app/hovermenu.js",
+      "type": "script"
+    },
+    {
+      "url": "app/uri.js",
+      "type": "script"
+    },
+    {
+      "url": "app/shikimori.js",
+      "type": "script"
+    },
+    {
+      "url": "app/main.js",
+      "type": "script"
+    }
+  ],
+  "version": 1
+}

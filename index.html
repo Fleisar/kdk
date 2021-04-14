@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Loading...</title>
+    <link id="icon" rel="icon" href="">
+    <link rel="stylesheet" href="styles.css">
+    <!--style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+        #app-load-scene {
+            font-family: "Segoe UI",sans-serif!important;
+            position: fixed;
+            z-index: 9999;
+            background: #f0f0f0;
+            width: 100vw;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            pointer-events: none;
+            opacity: 1;
+            transition: 2s opacity;
+        }
+        #app-load-scene.fade {
+            opacity: 0;
+            transition: 2s;
+        }
+        #app-load-app {
+            display: block;
+            font-size: 30px;
+            margin-block-start: 0.67em;
+            margin-block-end: 0.67em;
+            margin-inline-start: 0px;
+            margin-inline-end: 0px;
+            font-weight: bold;
+        }
+        #app-load-logo {
+            max-width: max(10vh,10vw);
+            max-height: max(10vh,10vw);
+            width: min(50vw,50vh);
+            height: min(50vw,50vh);
+        }
+    </style-->
+    <script src="storage.js"></script>
+    <script src="app.core.js"></script>
+    <script>if(!App.info)App.install()</script>
+</head>
+<body class="high-effects">
+    <div id="app-ui">
+        <div class="window updateRequest" style="display:none">
+            <h3>«<a class="name">$APP</a>» require update</h3>
+            <span><a style="color:#a66c00">$VERSION_OLD</a> ➔ <a style="color:#0066a4">$VERSION_NEW</a></span>
+            <p>$DESCRIPTION</p>
+            <hr/>
+            <div style="text-align:center">
+                <button onclick="App.ui.window.close();App.skipUpdate()">Skip</button>
+                <button onclick="App.install(App.DEFAULT_MANIFEST,true)">Update</button>
+            </div>
+        </div>
+        <div class="loadScreen">
+            <div>
+                <img>
+                <h1>Loading...</h1>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,69 @@
+#app-ui {
+  all: initial;
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1000;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 1em;
+  box-sizing: border-box;
+  font-family: "Segoe UI", sans-serif;
+  pointer-events: none;
+}
+#app-ui * {
+  all: revert;
+  font-family: "Segoe UI", sans-serif;
+  pointer-events: auto;
+}
+#app-ui .loadScreen {
+  top: 0;
+  left: 0;
+  position: absolute;
+  z-index: 1;
+  background: #f0f0f0;
+  width: 100vw;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  pointer-events: none;
+  opacity: 1;
+  transition: 2s opacity;
+}
+#app-ui .loadScreen.fade {
+  opacity: 0;
+}
+#app-ui .loadScreen img {
+  max-width: max(10vh, 10vw);
+  max-height: max(10vh, 10vw);
+  width: min(50vw, 50vh);
+  height: min(50vw, 50vh);
+}
+#app-ui .window {
+  border: 1px solid #b2b2b2;
+  border-radius: 3px;
+  padding: 1em;
+  background: linear-gradient(#ffffff, #dddddd);
+  width: 100%;
+  max-width: 720px;
+  text-shadow: 1px 1px #fff;
+  box-shadow: 0 6px 15px -2px #000;
+  z-index: 2;
+}
+#app-ui .updateRequest p {
+  max-height: 50vh;
+  overflow: hidden;
+  overflow-y: auto;
+}
+#app-ui .updateRequest button {
+  font-size: x-large;
+  width: 100px;
+  margin: 0 1em;
+}
+
+/*# sourceMappingURL=styles.css.map */
