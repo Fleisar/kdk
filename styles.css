@@ -17,7 +17,7 @@
 #app-ui * {
   all: revert;
   font-family: "Segoe UI", sans-serif;
-  pointer-events: auto;
+  pointer-events: inherit;
 }
 #app-ui .loadScreen {
   top: 0;
@@ -54,6 +54,7 @@
   text-shadow: 1px 1px #fff;
   box-shadow: 0 6px 15px -2px #000;
   z-index: 2;
+  pointer-events: auto;
 }
 #app-ui .updateRequest p {
   max-height: 50vh;
