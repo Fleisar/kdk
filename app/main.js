@@ -103,14 +103,14 @@ $(function(){
                 state: null,
                 shikimori: shikimori.animes(),
                 main(){
-                    $('main>.vcontainer').html(collections.loadingResults())
+                    $('main>.vcontainer').html('')
                     this._scrollUpdate()
                 },
                 update(){},
                 load(page=1){
                     this.state = 'loading'
                     this.shikimori.page(page).then(r=>{
-                        $('main>.vcontainer').html('')
+                        if(r.length===0) return $('main>.vcontainer').append(collections.noResults('Не удалось загрузить больше.'))
                         r.forEach(t=>{
                             $('main>.vcontainer').append(collections.title(t.id,t.image.preview,t.russian||t.name,t.name))
                         })
