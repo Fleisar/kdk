@@ -1,3 +1,4 @@
+/* API docs (official): https://shikimori.one/api/doc/1.0 */
 (function(){
     window.shikimori = {
         POOL_REQUEST: 'https://shikimori.one/api/',

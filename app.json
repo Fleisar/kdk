@@ -68,6 +68,10 @@
       "type": "script"
     },
     {
+      "url": "app/animetop.js",
+      "type": "script"
+    },
+    {
       "url": "app/main.js",
       "type": "script"
     }
