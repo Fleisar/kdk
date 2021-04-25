@@ -7,11 +7,29 @@
         <hr size>
         <div class="results"></div>
     </div>
+    <div class="window releases">
+        <h3><i class="material-icons">today</i> Расписание релизов</h3>
+        <hr size>
+    </div>
     <div class="window config">
         <h3><i class="material-icons">settings</i> Настройки</h3>
         <hr size>
         <div class="conf-block">
             <h5><i class="material-icons">brush</i>Внешний вид</h5>
+            <div>
+                <div class="el-switch">
+                    <input type="checkbox" id="el-8391412">
+                    <label for="el-8391412"></label>
+                </div>
+                Показывать кнопку рекоммендаций
+            </div>
+            <div>
+                <div class="el-switch">
+                    <input type="checkbox" id="el-0128412">
+                    <label for="el-0128412"></label>
+                </div>
+                Показывать кнопку расписаний
+            </div>
             <div>
                 <div class="el-switch">
                     <input type="checkbox" id="el-9018834">
@@ -106,6 +124,7 @@
                 <select class="form-select">
                     <option value="shikimori" selected>Shikimori</option>
                     <option value="kodik" disabled>Kodik</option>
+                    <option value="animetop" disabled>AnimeTop</option>
                 </select>
             </div>
             <button onclick="App.install(App.DEFAULT_MANIFEST,true)">Принудительно обновить</button>
