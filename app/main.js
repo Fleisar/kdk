@@ -218,6 +218,7 @@ $(function(){
             }
         }
     }
+    App.chrome.sw()
     windows.bind()
     config.init()
     console.log('KDK Anime v3.0.28.2259')

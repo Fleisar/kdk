@@ -84,6 +84,15 @@
             generatePackage(){
                 let blob = new Blob([`<html><head><link rel="manifest" href="${location.origin+location.pathname+App.info.application.manifest}"></head></html>`],{type:'text/html'})
                 window.open(URL.createObjectURL(blob))
+            },
+            sw(){
+                if (navigator.serviceWorker.controller) {
+                    console.log('[PWA Builder] active service worker found, no need to register')
+                } else {
+                    navigator.serviceWorker.register('app/sw.js').then(function(reg) {
+                        console.log('Service worker has been registered for scope:'+ reg.scope);
+                    });
+                }
             }
         },
         ui: {
