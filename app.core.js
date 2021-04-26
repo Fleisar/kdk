@@ -36,12 +36,24 @@
         run(install=false){
             storage.build(App.info.sources)
             let dom = ()=>{
+                if(App.info.application.name!==undefined){
+                    let meta = document.createElement('meta')
+                    meta.name = 'application-name'
+                    meta.content = App.info.application.name
+                    document.getElementsByTagName('head')[0].appendChild(meta)
+                }
+                if(App.info.application.manifest!==undefined){
+                    let link = document.createElement('link')
+                    link.rel = 'manifest'
+                    link.href = App.info.application.manifest
+                    document.getElementsByTagName('head')[0].appendChild(link)
+                }
                 if(App.info.logo) document.querySelector('#app-ui>.loadScreen img').setAttribute('src',App.info.logo)
                 if(App.info.name) document.querySelector('#app-ui>.loadScreen h1').innerHTML = App.info.name
                 if(App.info.icon) App.icon(App.info.icon[0],App.info.icon[1]||'icon')
                 App.title(App.info.short_name||App.info.name||'Application')
                 if(App.info.timeout) setTimeout(App.loaded, Number(App.info.timeout))
-                else if(!App.info.load_type||App.info.load_type==='default') App._load.add(App.loaded)
+                else if(!App.info.load_type||App.info.load_type==='default') this._load.add(this.loaded)
             }
             document.readyState==='loading'?document.addEventListener('DOMContentLoaded',dom):dom()
             if(install===true) App.info.install&&eval(`${App.info.install}()`)
@@ -67,6 +79,12 @@
         },
         skipUpdate(){
             return App.info.update.release = Math.floor((new Date()).getTime()/1e3), this
+        },
+        chrome: {
+            generatePackage(){
+                let blob = new Blob([`<html><head><link rel="manifest" href="${location.origin+location.pathname+App.info.application.manifest}"></head></html>`],{type:'text/html'})
+                window.open(URL.createObjectURL(blob))
+            }
         },
         ui: {
             updateDialog(manifest){
@@ -103,7 +121,7 @@
         _load: {
             state: false,
             init(){
-                if(document.readyState==='complete') return this.state=true
+                if(document.readyState==='complete') return (this.state=true, this.query.length>0&&this.query.forEach(f=>f()))
                 document.addEventListener('readystatechange',()=>{
                     if(document.readyState==='complete') this.query.length>0&&this.query.forEach(f=>f())
                     this.state = true
@@ -112,7 +130,7 @@
             query: [],
             add(handler){
                 if(typeof handler !== 'function') throw 'Handler must be a function'
-                if(this.state) return handler(), this
+                if(this.state||document.readyState==='complete') return handler(), this
                 return this.query.push(handler), this
             }
         },
