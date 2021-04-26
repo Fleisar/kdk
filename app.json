@@ -1,10 +1,14 @@
 {
   "dev_mode": 1,
   "short_name": "KDK",
-  "name": "KDK Player",
+  "name": "KDK Anime",
   "logo": "app/logo.svg",
   "icon": ["app/logo.ico","icon"],
-  "load_type": "default",
+  "application": {
+    "name": "KDK",
+    "manifest": "app/manifest.json"
+  },
+  "load_type": "self",
   "update": {
     "release": 0,
     "type": "dev",
@@ -76,5 +80,8 @@
       "type": "script"
     }
   ],
-  "version": 1
+  "version": 1,
+  "expo": {
+    
+  }
 }
