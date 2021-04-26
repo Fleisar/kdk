@@ -3,8 +3,14 @@ $(function(){
     window.binds = {
         aWindow: new Bind('a[data-window]','click'),
         hover: new Bind('header .hover','mousemove'),
-        bodyScroll: new Bind('main','scroll'),
-        lazyLoad: new LazyLoad({})
+        bodyScroll: new Bind('.page.general','scroll'),
+        lazyLoad: new LazyLoad({}),
+        titleHover: new hoverMenu('.tile',[
+            'Открыть',
+            {text:'<span class="material-icons list-icon">favorite</span>Любимое',action:'stay'},
+            '<span class="material-icons list-icon">content_copy</span>Скопировать название',
+            {text:'<span class="list-icon" style="background-color:rgba(var(--brand-gray),0.5)"><img src="https://shikimori.one/assets/layouts/l-top_menu-v2/glyph.svg" height="24"></span>Открыть в Shikimori',classes:['externalLink']}
+        ],{classes:['list-with-icons']})
     }
     $(function(){
         binds.hover.bind(function(e){
@@ -19,7 +25,7 @@ $(function(){
         console.groupCollapsed('Redirected to #'+url.address)
         console.log(st)
         console.groupEnd()
-        pages.init()
+        pages.processor()
     })
     window.toRGB = function(hex){
         let hex_code = hex.split(""),
@@ -30,7 +36,7 @@ $(function(){
     }
     let collections = {
         title(id,poster,name,original_name){
-            return `<a data-page="player" data-add='{"id":${id}}' title="${name}\n${original_name}" class="tile-href"><div class="tile"><div class="tile-preview"><img alt="${original_name}" class="lazy" data-src="//shikimori.one${poster}"></div><span>${name}</span></div></a>`
+            return `<a data-page="player" href="#player/shikimori/${id}"><div class="tile" data='{"id":${id},"name":"${original_name}"}'><div class="tile-preview"><img alt="${original_name}" class="lazy" data-src="//shikimori.one${poster}"></div><span>${name}</span></div></a>`
         },
         loadingResults(){
             return '<div class="load-block"><span class="material-icons">hourglass_empty</span></div>'
@@ -83,9 +89,15 @@ $(function(){
     let pages = {
         _current: 'general',
         _working: [],
+        levels: [],
         init(){
-            switch (true) {
-                case window.url.address.startsWith('pl-'): return this.set('player')
+            return this.processor()
+        },
+        processor(){
+            this.levels = url.address.split('/')
+            switch (this.levels[0]){
+                case 'player': return this.set('player')
+                case 'general':
                 default: return this.set('general')
             }
         },
@@ -103,22 +115,37 @@ $(function(){
                 state: null,
                 shikimori: shikimori.animes(),
                 main(){
+                    let tile = {}
                     $('main>.vcontainer').html('')
                     this._scrollUpdate()
+                    binds.titleHover.on('click',n=>{
+                        console.log(n,tile)
+                        switch (Number(n)) {
+                            case 0: return url.set('#player/shikimori/'+tile.id,{})
+                            case 1: break
+                            case 2: break
+                            case 3: return window.open('https://shikimori.one/animes/'+tile.id)
+                        }
+                    }).on('open',e=>{
+                        tile = JSON.parse($(e.delegateTarget).attr('data'))
+                        console.log(tile)
+                    })
                 },
                 update(){},
                 load(page=1){
                     this.state = 'loading'
                     this.shikimori.page(page).then(r=>{
-                        if(r.length===0) return $('main>.vcontainer').append(collections.noResults('Не удалось загрузить больше.'))
+                        if(r.length===0) return $('.page.general>.vcontainer').append(collections.noResults('Не удалось загрузить больше.'))
                         r.forEach(t=>{
-                            $('main>.vcontainer').append(collections.title(t.id,t.image.preview,t.russian||t.name,t.name))
+                            $('.page.general>.vcontainer').append(collections.title(t.id,t.image.preview,t.russian||t.name,t.name))
                         })
+                        App.loaded()
                         this.state = null
                         binds.lazyLoad.update()
                         binds.aWindow.update()
+                        binds.titleHover.update()
                     },e=>{
-                        $('main>.vcontainer').html(collections.noResults())
+                        $('.page.general>.vcontainer').html(collections.noResults())
                         console.groupCollapsed('Unable to load titles')
                         Array(...arguments).forEach(a=>console.error(a))
                         console.groupEnd()
@@ -134,8 +161,39 @@ $(function(){
                 }
             },
             player: {
-                main(){},
-                update(){},
+                _current: 'kodik',
+                main(){
+                    App.loaded()
+                    this.update()
+                },
+                load(){},
+                update(){
+                    this.setPlayer(pages.levels[1],pages.levels[2])
+                },
+                setPlayer(name,id){
+                    $('.page.player .player-'+this._current).hide()
+                    switch (name){
+                        case 'animetop': break;
+                        case 'shikimori':
+                            $('.page.player .player-kodik').show()
+                            this.players.kodik.setShikimori(id)
+                            break;
+                        case 'kodik':
+                        default:
+                            $('.page.player .player-kodik').show()
+                            this.players.kodik.setVideo(id)
+                            break;
+
+                    }
+                },
+                players: {
+                    kodik: {
+                        setShikimori(id){
+                            $('.page.player .player-kodik').attr('src',`//kodik.cc/find-player?shikimoriID=${id}`)
+                        },
+                        setVideo(id){}
+                    }
+                },
                 unload(){}
             }
         }
@@ -145,7 +203,7 @@ $(function(){
             dom: {
                 results: $('.window.search .results')
             },
-            search: (text) => {
+            search(text){
                 this.dom.results.html(collections.loadingResults())
                 shikimori.animes().status('').order('').search(text).then(r=>{
                     this.dom.results.html('')
@@ -153,6 +211,7 @@ $(function(){
                     r.forEach(t=>{
                         this.dom.results.append(collections.title(t.id,t.image.preview,t.russian||t.name,t.name))
                     })
+                    binds.titleHover.update()
                     binds.lazyLoad.update()
                     binds.aWindow.update()
                 })
