@@ -1,5 +1,7 @@
 (function(){
     window.URI = function(url,data){
+        this.address = ''
+        this.page = {}
         window.onpopstate = e => {
             this._orh&&this._orh.forEach(f=>f(e.state||{}))
         }
@@ -11,10 +13,8 @@
         else this._orh&&this._orh.forEach(f=>f({}))
     }
     window.URI.prototype = {
-        address: '',
-        page: {},
         set(url,data={}){
-            if(typeof url !== 'string' && typeof data !== 'object') throw `Invalid input variables`
+            if(typeof url !== 'string' || typeof data !== 'object') throw `Invalid input variables`
             return window.history.pushState(data,'',url), this
         },
         onRedirect(callback){
