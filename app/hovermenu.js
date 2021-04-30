@@ -9,7 +9,7 @@
         this.selector = selector
         this._hBind()
         this.name = `hoverMenu-${(new Date()).getTime()}`
-        $('body').append(`<ul id="${this.name}" class="hovermenu"></ul>`)
+        $('body').append(`<ul id="${this.name}"></ul>`)
         this.ROOT = $(`#${this.name}`).css({
             position: 'fixed',
             'z-index': '999'
