@@ -2,15 +2,17 @@ $(function(){
     window.url = new URI('#')
     window.binds = {
         aWindow: new Bind('a[data-window]','click'),
-        hover: new Bind('header .hover','mousemove'),
+        hover: new Bind('header a','mousemove'),
         bodyScroll: new Bind('.page.general','scroll'),
         lazyLoad: new LazyLoad({}),
-        titleHover: new hoverMenu('.tile',[
+        titleHover: new hoverMenu('.ui-title',[
             'Открыть',
-            {text:'<span class="material-icons list-icon">favorite</span>Любимое',action:'stay'},
-            '<span class="material-icons list-icon">content_copy</span>Скопировать название',
-            {text:'<span class="list-icon" style="background-color:rgba(var(--brand-gray),0.5)"><img src="https://shikimori.one/assets/layouts/l-top_menu-v2/glyph.svg" height="24"></span>Открыть в Shikimori',classes:['externalLink']}
-        ],{classes:['list-with-icons']})
+            '<span class="material-icons icon">info</span>Информация',
+            {text:'<span class="material-icons icon">favorite</span>Любимое',action:'stay'},
+            '<span class="material-icons icon">content_copy</span>Скопировать название',
+            {text:'<span class="icon" style="background-color:rgba(var(--colorFill),0.5)"><img src="https://shikimori.one/assets/layouts/l-top_menu-v2/glyph.svg" height="24"></span>Открыть в Shikimori',classes:['externalLink']}
+        ],{classes:['icon-list','ui-hovermenu']}),
+        config: new configCollector()
     }
     $(function(){
         binds.hover.bind(function(e){
@@ -36,20 +38,40 @@ $(function(){
     }
     let collections = {
         title(id,poster,name,original_name){
-            return `<a data-page="player" href="#player/shikimori/${id}"><div class="tile" data='{"id":${id},"name":"${original_name}"}'><div class="tile-preview"><img alt="${original_name}" class="lazy" data-src="//shikimori.one${poster}"></div><span>${name}</span></div></a>`
+            return `
+                <a data-page="player" href="#player/shikimori/${id}">
+                    <div class="ui-title" data='{"id":${id},"name":"${original_name}"}'>
+                        <img alt="${original_name}" class="lazy" data-src="//shikimori.one${poster}">
+                        <div></div>
+                    </div>
+                </a>
+            `
         },
         loadingResults(){
-            return '<div class="load-block"><span class="material-icons">hourglass_empty</span></div>'
+            return '<div class="ui-load"><span class="material-icons">hourglass_empty</span></div>'
         },
         noResults(text='Не удалось ничего найти'){
-            return '<div class="error-block"><div><span class="material-icons">announcement</span><h5>'+text+'</h5></div></div>'
+            return '<div class="ui-error"><div><span class="material-icons">announcement</span><h5>'+text+'</h5></div></div>'
         }
     }
-    let config = {
-        init(){
-
+    let config = (k,v)=>{
+        let body = $('body')
+        switch (k) {
+            case 'disableAnimations': return body.attr('disableAnimations',v.toString())
+            case 'showTime': return $('.ui-clock').attr('display',v.toString());
+            case 'showReleases': return $('header [data-window=releases]').attr('display',v.toString())
+            case 'showHistory': return $('header [data-window=history]').attr('display',v.toString())
+            case 'showFavorite': return $('header [data-window=favorite]').attr('display',v.toString())
+            case 'colorBG': return body.css('--colorBackground',toRGB(v).join(', '))
+            case 'colorText': return body.css('--colorText',toRGB(v).join(', '))
+            case 'colorFill': return body.css('--colorFill',toRGB(v).join(', '))
+            case 'colorHref': return body.css('--colorHref',toRGB(v).join(', '))
+            case 'playerMode':
+                $('div.page.player, div.window.config div.player-preview').attr('playerMode', v)
+                break;
         }
     }
+    binds.config.change(config)
     let windows = {
         container: false,
         current: null,
@@ -60,11 +82,11 @@ $(function(){
                 if(e.target.dataset.window===this.current&&this.container){
                     $('.window.'+this.current).removeClass('active')
                     this.current = null
-                    $('.windows-container').removeClass('use')
+                    $('.windows').removeClass('use')
                     this.container = false
                 }else{
                     this.current!==null&&$('.window.'+this.current).removeClass('active')
-                    !this.container&&$('.windows-container').addClass('use')
+                    !this.container&&$('.windows').addClass('use')
                     $('.window.'+e.currentTarget.dataset.window).addClass('active')
                     this.current = e.currentTarget.dataset.window
                     this.container = true
@@ -135,9 +157,9 @@ $(function(){
                 load(page=1){
                     this.state = 'loading'
                     this.shikimori.page(page).then(r=>{
-                        if(r.length===0) return $('.page.general>.vcontainer').append(collections.noResults('Не удалось загрузить больше.'))
+                        if(r.length===0) return $('.page.general div.all').append(collections.noResults('Не удалось загрузить больше.'))
                         r.forEach(t=>{
-                            $('.page.general>.vcontainer').append(collections.title(t.id,t.image.preview,t.russian||t.name,t.name))
+                            $('.page.general div.all').append(collections.title(t.id,t.image.preview,t.russian||t.name,t.name))
                         })
                         App.loaded()
                         this.state = null
@@ -216,10 +238,23 @@ $(function(){
                     binds.aWindow.update()
                 })
             }
+        },
+        clock: {
+            set(){
+                let date = new Date()
+                $('.ui-clock').text((date.getHours()>9?date.getHours():'0'+date.getHours())+':'+(date.getMinutes()>9?date.getMinutes():'0'+date.getMinutes()))
+                window.clock = setInterval(function(){
+                    let date = new Date()
+                    $('.ui-clock').text((date.getHours()>9?date.getHours():'0'+date.getHours())+':'+(date.getMinutes()>9?date.getMinutes():'0'+date.getMinutes()))
+                },1e3)
+            }
+        },
+        hotkeys: {
+
         }
     }
+    workers.clock.set()
     App.chrome.sw()
     windows.bind()
-    config.init()
     console.log('KDK Anime v3.0.28.2259')
 })
