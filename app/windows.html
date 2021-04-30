@@ -1,151 +1,159 @@
-<div class="windows-container">
+<div class="windows">
     <div class="window search">
-        <h3 class="input-group">
-            <button class="input-group-text material-icons">search</button>
-            <input type="text" class="form-control" placeholder="Поиск">
-        </h3>
-        <hr size>
-        <div class="results"></div>
+        <h2><i class="material-icons">search</i> Поиск</h2>
+        <hr>
     </div>
     <div class="window releases">
-        <h3><i class="material-icons">today</i> Расписание релизов</h3>
-        <hr size>
+        <h2><i class="material-icons">today</i> Расписание релизов</h2>
+        <hr>
     </div>
     <div class="window config">
-        <h3><i class="material-icons">settings</i> Настройки</h3>
-        <hr size>
-        <div class="conf-block">
-            <h5><i class="material-icons">brush</i>Внешний вид</h5>
+        <h2><i class="material-icons">settings</i> Настройки</h2>
+        <hr>
+        <h3><i class="material-icons">extension</i> Настройки интерфейса</h3>
+        <div class="ui-grid">
             <div>
-                <div class="el-switch">
-                    <input type="checkbox" id="el-8391412">
-                    <label for="el-8391412"></label>
-                </div>
-                Показывать кнопку рекоммендаций
+                <input id="8YMhUhte" type="checkbox" name="disableAnimations" class="ui-switch config-collector">
+                <label for="8YMhUhte">Отключить все анимации</label>
             </div>
             <div>
-                <div class="el-switch">
-                    <input type="checkbox" id="el-0128412">
-                    <label for="el-0128412"></label>
-                </div>
-                Показывать кнопку расписаний
+                <input id="rJQ4NcsN" type="checkbox" name="showTime" class="ui-switch config-collector">
+                <label for="rJQ4NcsN">Показыввать локальное время на сайте</label>
             </div>
             <div>
-                <div class="el-switch">
-                    <input type="checkbox" id="el-9018834">
-                    <label for="el-9018834"></label>
-                </div>
-                Показывать локальное время на сайте
+                <input id="Gnxy6Rh2" type="checkbox" name="showReleases" class="ui-switch config-collector">
+                <label for="Gnxy6Rh2">Показывать расписание релизов</label>
             </div>
             <div>
-                <div class="color-picker">
-                    <input type='color' value="#4E4E4E" onchange="document.documentElement.style.setProperty('--brand-gray', toRGB(this.value));">
-                    Тёмный цвет
-                </div>
+                <input id="5QCpQWnW" type="checkbox" name="showHistory" class="ui-switch config-collector" checked>
+                <label for="5QCpQWnW">Показывать историю просмотров</label>
             </div>
             <div>
-                <div class="color-picker">
-                    <input type='color' value="#f0f0f0" onchange="document.documentElement.style.setProperty('--brand-white', toRGB(this.value));">
-                    Светлый цвет
-                </div>
+                <input id="EQF5jjf6" type="checkbox" name="showFavorite" class="ui-switch config-collector" checked>
+                <label for="EQF5jjf6">Показывать список любимого</label>
             </div>
             <div>
-                <div class="color-picker">
-                    <input type='color' value="#000" onchange="document.documentElement.style.setProperty('--g-color', toRGB(this.value));">
-                    Цвет текста
-                </div>
-            </div>
-            <div class="conf-mode-preview">
-                Режим просмотра аниме:<br/>
-                <select class="form-select" onchange="this.dataset.chosen=this.value;" data-chosen="0">
-                    <option value="0" selected>Кинотеарт</option>
-                    <option value="1">На весь экран</option>
-                    <option value="2">В окне</option>
+                <span>Внешний вид плеера</span>
+                <select class="config-collector" name="playerMode">
+                    <option value="cinema" selected>Кинотеатр</option>
+                    <option value="fullscreen">Полноэкранный</option>
+                    <option value="windowed">Оконный</option>
                 </select>
-                <div class="preview">
-                    <div class="video">
-
-                    </div>
-                </div>
             </div>
-            <div class="border border-danger rounded p-2 dev-option">
-                <div>
-                    <div class="el-switch">
-                        <input type="checkbox" id="el-0973523">
-                        <label for="el-0973523"></label>
-                    </div>
-                    Режим повышеных эффектов
-                </div>
-                <span class="transparent description-l">Режим повышеных эффектов может негативно влиять на самочувствие. Если при использовании этого режима у вас ухудшилось самочувствие, пожалуйста отключите его.</span>
+            <div class="player-preview" playerMode="cinema">
+                <div class="player"></div>
             </div>
         </div>
-        <div class="conf-block">
-            <h5><i class="material-icons">search</i>Настройки результатов</h5>
-            <div class="border rounded p-2">
-                <div>
-                    <div class="el-switch">
-                        <input type="checkbox" id="el-9834552">
-                        <label for="el-9834552"></label>
-                    </div>
-                    Поиск в реальном времени
-                </div>
-                <span class="description-l transparent">Поиск будет производиться по мере набора текста</span>
-            </div>
-            <div class="input-group mb-3">
-                <span class="input-group-text">Кол-во загружаемых тайтлов</span>
-                <input type="number" class="form-control" placeholder="50" min="10" max="50" value="50" step="1">
-            </div>
-            <div class="input-group mb-3">
-                <span class="input-group-text">Сортировать по</span>
-                <select class="form-select">
-                    <option value="id">ID</option>
-                    <option value="ranked" selected>Рангу</option>
-                    <option value="kind">Типу</option>
-                    <option value="popularity">Популярности</option>
-                    <option value="name">Названию</option>
-                    <option value="aired_on">Дате выхода</option>
-                    <option value="episodes">Эпизодам</option>
-                    <option value="status">Статусу</option>
-                    <option value="random">Случайности</option>
-                </select>
-            </div>
-            <div class="border border-danger rounded p-2 transparent">
-                <div>
-                    <div class="el-switch">
-                        <input type="checkbox" id="el-4875224">
-                        <label for="el-4875224"></label>
-                    </div>
-                    Показывать RX тайтлы
-                </div>
-                <span class="description-l">RX rating - Hentai (extreme sexual content/nudity). Не все аниме тайтлы RX рейтинга могут быть доступны.</span>
-            </div>
-            <div class="input-group mb-3">
-                <span class="input-group-text">API поиска</span>
-                <select class="form-select">
-                    <option value="shikimori" selected>Shikimori</option>
-                    <option value="kodik" disabled>Kodik</option>
-                    <option value="animetop" disabled>AnimeTop</option>
-                </select>
-            </div>
-            <button onclick="App.install(App.DEFAULT_MANIFEST,true)">Принудительно обновить</button>
-            <button onclick="App.checkUpdate()">Проверить обновления</button>
+        <h3><i class="material-icons">palette</i> Цветовая палитра</h3>
+        <div class="ui-grid col-3 big">
+            <input type="color" name="colorFill" style="--text:'Заливка'" class="ui-color config-collector" value="#4e4e4e">
+            <input type="color" name="colorBG" style="--text:'Фон'" class="ui-color config-collector" value="#f0f0f0">
+            <input type="color" name="colorText" style="--text:'Текст'" class="ui-color config-collector" value="#000000">
+            <input type="color" name="colorHref" style="--text:'Ссылки'" class="ui-color config-collector" value="#2b769f">
         </div>
-
+        <h3><i class="material-icons">find_in_page</i> Настройки поиска</h3>
+        <div class="ui-grid">
+            <div>
+                <input id="mSRrDrY5" type="checkbox" name="realtimeSearch" class="ui-switch config-collector">
+                <label for="mSRrDrY5">Поиск в реальном времени</label>
+            </div>
+        </div>
+        <h3><i class="material-icons">track_changes</i> Сбор данных</h3>
+        <div class="ui-grid">
+            <div>
+                <input id="pXQPrP7b" type="checkbox" name="collectInformation" class="ui-switch config-collector">
+                <label for="pXQPrP7b">Собирать информацию об использовании</label>
+            </div>
+            <div>
+                <input id="nxe2LUhn" type="checkbox" name="sendInformation" class="ui-switch config-collector">
+                <label for="nxe2LUhn">Отправлять данные на сервера</label>
+            </div>
+        </div>
+        <h3><i class="material-icons">build</i> Приложение</h3>
+        <div class="ui-grid col-2">
+            <button onClick="App.checkUpdate()">Проверить обновления</button>
+            <button onClick="App.install(App.DEFAULT_MANIFEST,true)">Принудительно обновить</button>
+            <button onClick="localStorage.clear();location.reload()">Сбросить</button>
+        </div>
+        <h3><i class="material-icons">privacy_tip</i> Информация</h3>
+        <div class="ui-grid ui-hrefs">
+            <a data-window="info-usage">Использование информации на клиенте</a>
+            <a data-window="info-processing">Использование информации на сервере</a>
+            <a data-window="about">О сайте</a>
+        </div>
     </div>
     <div class="window history">
-        <h3><i class="material-icons">history</i> История просмотра</h3>
-        <hr size>
+        <h2><i class="material-icons">history</i> История просмотра</h2>
+        <hr>
     </div>
     <div class="window favorite">
-        <h3><i class="material-icons">favorite</i> Любимое</h3>
-        <hr size>
+        <h2><i class="material-icons">favorite</i> Любимое</h2>
+        <hr>
     </div>
     <div class="window title-info">
-        <h3>$TITLE NAME</h3>
-        <hr size>
+        <h2>$TITLE NAME</h2>
+        <hr>
+    </div>
+    <div class="window info-usage">
+        <h2><i class="material-icons">phonelink_setup</i> Использование информации на клиенте</h2>
+        <hr>
+        <h4>Что мы собираем?</h4>
+        <ul>
+            <li>Историю просмотров (в т.ч. кол-во просмотренных серий)</li>
+            <li>Список любимого</li>
+        </ul>
+        <p class="ui-remark">В этот перечень не входят данные, собираемые другими севисами, которые присутствуют на сайте
+        , такие как: Shikimori, Kodik и другие.</p>
+        <h4>Для чего мы делаем это?</h4>
+        <p>Все перечисленные выше данные собираются исключительно для улучшения рекомендаций, которые подходят именно
+        вам. Собираемые данные хранятся исключительно на вашем устройстве и могут быть отчищены по желанию в настройках
+        сайта. Также сбор данных ограничен по умолчанию для сохранения приватности пользователя.</p>
+        <p class="ui-remark">Некоторые функции сбора данных невозможно отключить так как они предоставляют базовые
+        функции сайта.</p>
+    </div>
+    <div class="window info-processing">
+        <h2><i class="material-icons">dns</i> Использование информации на сервере</h2>
+        <hr>
+        <h4>Что мы собираем?</h4>
+        <ul>
+            <li>Список любимого</li>
+            <li>Используемое устройство (тип)</li>
+            <li>Используемый браузер (название, версия)</li>
+        </ul>
+        <h4>Для чего мы делаем это?</h4>
+        <p>Списки любимого используются для улучшения рекомендаций других пользователей сайта с похожими интересами.
+        Информация о типе устройства и браузера используется для статистики и будущей возможной адаптацией под подобные
+        платформы.</p>
+        <p class="ui-remark">Информация на стороне сервера подписывается уникальным значением, это даёт нам возможность
+        однозначно определить пользователя. Подобная идендификация предотвращает дубликацию на стороне сервера. Она не
+        используется в рекламных или иных комерческих целях.</p>
     </div>
     <div class="window about">
-        <h3><i class="material-icons">info</i> О сайте</h3>
-        <hr size>
+        <h2><i class="material-icons">info</i> О сайте</h2>
+        <hr>
+        <h3>Разработчик</h3>
+        <a href="https://github.com/Fleisar" target="_blank">Fleisar</a>
+        <h3>Используемый материал</h3>
+        <h4>Библиотеки</h4>
+        <ul class="ui-hrefs">
+            <li><a href="https://github.com/jquery/jquery" target="_blank">jQuery</a></li>
+            <li><a href="https://github.com/Fleisar/kdk" target="_blank">shikimori (самописная)</a></li>
+            <li><a href="https://github.com/Fleisar/kdk" target="_blank">animetop (самописная)</a></li>
+            <li><a href="https://github.com/Fleisar/kdk" target="_blank">Bind addon (самописная)</a></li>
+            <li><a href="https://github.com/Fleisar/hover-menu" target="_blank">HoverMenu</a></li>
+            <li><a href="https://github.com/Fleisar" target="_blank">App core</a></li>
+        </ul>
+        <h4>API сервисы</h4>
+        <ul class="ui-hrefs">
+            <li><a href="https://kodik.cc/" target="_blank">Kodik</a></li>
+            <li><a href="https://shikimori.one/" target="_blank">Shikimori</a></li>
+            <li><a href="https://animetop.org/" target="_blank">AnimeTop</a></li>
+        </ul>
+        <h3>Немного о истории</h3>
+        <p>Этот сайт создан для свободного просмотра аниме без лишнего и максимально "кастомную" для
+        пользователя. На сайте мы стараемся собирать информацию по минимуму и предоставлять как можно больше
+        полезных функций. Если у вас есть какие-то пожелания, мы всегда открыты для предложений на
+            <a href="https://github.com/Fleisar/kdk/issues" target="_blank">GitHub</a> и
+            <a href="https://discord.gg/XK6BKFJ" target="_blank">Discord-сервере</a>.</p>
     </div>
 </div>
