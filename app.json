@@ -20,11 +20,11 @@
   },
   "sources": [
     {
-      "url": "https://fonts.googleapis.com/css2?family=Roboto&display=swap",
+      "url": "app/styles.css",
       "type": "style"
     },
     {
-      "url": "https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css",
+      "url": "https://fonts.googleapis.com/css2?family=Roboto&display=swap",
       "type": "style"
     },
     {
@@ -40,14 +40,6 @@
       "type": "html"
     },
     {
-      "url": "app/global.css",
-      "type": "style"
-    },
-    {
-      "url": "app/index.css",
-      "type": "style"
-    },
-    {
       "url": "https://code.jquery.com/jquery-3.5.1.min.js",
       "type": "script"
     },
@@ -61,6 +53,10 @@
     },
     {
       "url": "app/hovermenu.js",
+      "type": "script"
+    },
+    {
+      "url": "app/configCollector.js",
       "type": "script"
     },
     {
