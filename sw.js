@@ -8,14 +8,6 @@ self.addEventListener('install', function(event) {
         }));
 });
 self.addEventListener('fetch', function(event) {
-    var updateCache = function(request){
-        return caches.open('pwabuilder-offline').then(function (cache) {
-            return fetch(request).then(function (response) {
-                return cache.put(request, response);
-            });
-        });
-    };
-    event.waitUntil(updateCache(event.request));
     event.respondWith(
         fetch(event.request).catch(function(error) {
             console.log( '[PWA Builder] Network request Failed. Serving content from cache: ' + error );
