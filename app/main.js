@@ -1,6 +1,7 @@
 $(function(){
     window.url = new URI('#')
     window.binds = {
+        aPage: new Bind('a[data-page]','click'),
         aWindow: new Bind('a[data-window]','click'),
         hover: new Bind('header a','mousemove'),
         bodyScroll: new Bind('.page.general','scroll'),
@@ -22,6 +23,9 @@ $(function(){
             })
         },'jq.custom')
         pages.init()
+        binds.aPage.bind(function(){
+            pages.set($(this).attr('data-page'))
+        },'jq.custom')
     })
     url.onRedirect(st=>{
         console.groupCollapsed('Redirected to #'+url.address)
@@ -37,12 +41,24 @@ $(function(){
         return [red,green,blue]
     }
     let collections = {
-        title(id,poster,name,original_name){
+        title(id,poster,name,original_name,data){
             return `
                 <a data-page="player" href="#player/shikimori/${id}">
-                    <div class="ui-title" data='{"id":${id},"name":"${original_name}"}'>
+                    <div class="ui-title" data-add='${JSON.stringify(data)}'>
                         <img alt="${original_name}" class="lazy" data-src="//shikimori.one${poster}">
                         <div></div>
+                    </div>
+                </a>
+            `
+        },
+        titleEx(id,poster,name,original_name,data){
+            return `
+                <a data-page="player" href="#player/shikimori/${id}">
+                    <div>
+                        <div class="ui-title" data-add='${JSON.stringify(data)}'>
+                            <img alt="${original_name}" class="lazy" data-src="//shikimori.one${poster}">
+                        </div>
+                        <span title="${original_name}">${name||original_name}</span>
                     </div>
                 </a>
             `
@@ -77,22 +93,25 @@ $(function(){
         current: null,
         bind(){
             binds.aWindow.bind(e=>{
-                console.log(e)
                 let data = JSON.parse(e.currentTarget.dataset.add||"{}")
-                if(e.target.dataset.window===this.current&&this.container){
-                    $('.window.'+this.current).removeClass('active')
-                    this.current = null
-                    $('.windows').removeClass('use')
-                    this.container = false
-                }else{
-                    this.current!==null&&$('.window.'+this.current).removeClass('active')
-                    !this.container&&$('.windows').addClass('use')
-                    $('.window.'+e.currentTarget.dataset.window).addClass('active')
-                    this.current = e.currentTarget.dataset.window
-                    this.container = true
-                }
-                this.array[e.currentTarget.dataset.window]&&this.array[e.currentTarget.dataset.window](data)
+                    ,name = e.target.dataset.window
+                if(name===this.current&&this.container) return this.close()
+                return this.open(name,data)
             },'windows.bind')
+        },
+        open(name,data={}){
+            if(this.current!==null) $('.window.'+this.current).removeClass('active')
+            else !this.container&&$('.windows').addClass('use')
+            $('.window.'+name).addClass('active')
+            this.current = name
+            this.container = true
+            this.array[name]&&this.array[name](data)
+        },
+        close(){
+            $('.window.'+this.current).removeClass('active')
+            this.current = null
+            $('.windows').removeClass('use')
+            this.container = false
         },
         array: {
             config: () => {
@@ -102,8 +121,11 @@ $(function(){
                 console.log(data)
             },
             search: () => {
-                $('.window.search input[type=text]').unbind('keypress').keypress(e=>{
+                $('.window.search .search-input>input[type=text]').unbind('keypress').keypress(e=>{
                     if(e.key === 'Enter') workers.search.search($('.window.search input[type=text]').val())
+                })
+                $('.window.search .search-input>button').unbind('click').click(e=>{
+                    workers.search.search($('.window.search input[type=text]').val())
                 })
             }
         }
@@ -125,6 +147,7 @@ $(function(){
         },
         set(name){
             if(Object.keys(this.array).indexOf(name)===-1) throw 'This page doesn\'t exist'
+            windows.close()
             $('.page.'+this._current).css('display','none')
             'unload'in this.array[this._current]&&this.array[this._current].unload(...Array(...arguments).splice(1))
             this._current = name
@@ -184,15 +207,20 @@ $(function(){
             },
             player: {
                 _current: 'kodik',
+                _title: undefined,
+                _data: undefined,
                 main(){
                     App.loaded()
                     this.update()
                 },
                 load(){},
                 update(){
-                    this.setPlayer(pages.levels[1],pages.levels[2])
+                    if(this._title!==pages.levels[1].toString()+pages.levels[2].toString())
+                        this.setPlayer(pages.levels[1],pages.levels[2])
+                    $('header>nav>a.player-show').hide()
                 },
                 setPlayer(name,id){
+                    this._title = name.toString()+id.toString()
                     $('.page.player .player-'+this._current).hide()
                     switch (name){
                         case 'animetop': break;
@@ -216,7 +244,9 @@ $(function(){
                         setVideo(id){}
                     }
                 },
-                unload(){}
+                unload(){
+                    $('header>nav>a.player-show').show()
+                }
             }
         }
     }
@@ -231,7 +261,7 @@ $(function(){
                     this.dom.results.html('')
                     if(r.length===0)$('.window.search .results').html(collections.noResults())
                     r.forEach(t=>{
-                        this.dom.results.append(collections.title(t.id,t.image.preview,t.russian||t.name,t.name))
+                        this.dom.results.append(collections.titleEx(t.id,t.image.preview,t.russian||t.name,t.name))
                     })
                     binds.titleHover.update()
                     binds.lazyLoad.update()
@@ -249,10 +279,20 @@ $(function(){
                 },1e3)
             }
         },
-        hotkeys: {
-
+        hotkeys(){
+            hotkeys('esc,alt+o,alt+s',function(e,h){
+                switch(h.key){
+                    case 'esc':
+                        if(windows.current!==null)windows.close()
+                        else pages.set('general')
+                        break;
+                    case 'alt+o': windows.open('config'); break;
+                    case 'alt+s': windows.open('search'); break;
+                }
+            })
         }
     }
+    workers.hotkeys()
     workers.clock.set()
     App.chrome.sw()
     windows.bind()

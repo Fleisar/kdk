@@ -1,7 +1,11 @@
 <div class="windows">
     <div class="window search">
-        <h2><i class="material-icons">search</i> Поиск</h2>
+        <div class="search-input">
+            <button class="material-icons">search</button>
+            <input placeholder="Поиск" type="text" maxlength="50">
+        </div>
         <hr>
+        <div class="ui-grid results"></div>
     </div>
     <div class="window releases">
         <h2><i class="material-icons">today</i> Расписание релизов</h2>
@@ -11,7 +15,7 @@
         <h2><i class="material-icons">settings</i> Настройки</h2>
         <hr>
         <h3><i class="material-icons">extension</i> Настройки интерфейса</h3>
-        <div class="ui-grid">
+        <div class="ui-grid results">
             <div>
                 <input id="8YMhUhte" type="checkbox" name="disableAnimations" class="ui-switch config-collector">
                 <label for="8YMhUhte">Отключить все анимации</label>
@@ -20,15 +24,15 @@
                 <input id="rJQ4NcsN" type="checkbox" name="showTime" class="ui-switch config-collector">
                 <label for="rJQ4NcsN">Показыввать локальное время на сайте</label>
             </div>
-            <div>
+            <div class="ui-disabled">
                 <input id="Gnxy6Rh2" type="checkbox" name="showReleases" class="ui-switch config-collector">
                 <label for="Gnxy6Rh2">Показывать расписание релизов</label>
             </div>
-            <div>
+            <div class="ui-disabled">
                 <input id="5QCpQWnW" type="checkbox" name="showHistory" class="ui-switch config-collector" checked>
                 <label for="5QCpQWnW">Показывать историю просмотров</label>
             </div>
-            <div>
+            <div class="ui-disabled">
                 <input id="EQF5jjf6" type="checkbox" name="showFavorite" class="ui-switch config-collector" checked>
                 <label for="EQF5jjf6">Показывать список любимого</label>
             </div>
@@ -52,14 +56,14 @@
             <input type="color" name="colorHref" style="--text:'Ссылки'" class="ui-color config-collector" value="#2b769f">
         </div>
         <h3><i class="material-icons">find_in_page</i> Настройки поиска</h3>
-        <div class="ui-grid">
+        <div class="ui-grid ui-disabled">
             <div>
                 <input id="mSRrDrY5" type="checkbox" name="realtimeSearch" class="ui-switch config-collector">
                 <label for="mSRrDrY5">Поиск в реальном времени</label>
             </div>
         </div>
         <h3><i class="material-icons">track_changes</i> Сбор данных</h3>
-        <div class="ui-grid">
+        <div class="ui-grid ui-disabled">
             <div>
                 <input id="pXQPrP7b" type="checkbox" name="collectInformation" class="ui-switch config-collector">
                 <label for="pXQPrP7b">Собирать информацию об использовании</label>
@@ -137,6 +141,8 @@
         <h4>Библиотеки</h4>
         <ul class="ui-hrefs">
             <li><a href="https://github.com/jquery/jquery" target="_blank">jQuery</a></li>
+            <li><a href="https://github.com/verlok/vanilla-lazyload" target="_blank">LazyLoad</a></li>
+            <li><a href="https://github.com/jaywcjlove/hotkeys" target="_blank">Hotkeys</a></li>
             <li><a href="https://github.com/Fleisar/kdk" target="_blank">shikimori (самописная)</a></li>
             <li><a href="https://github.com/Fleisar/kdk" target="_blank">animetop (самописная)</a></li>
             <li><a href="https://github.com/Fleisar/kdk" target="_blank">Bind addon (самописная)</a></li>

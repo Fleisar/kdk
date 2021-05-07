@@ -93,7 +93,7 @@ header {
         --x: 0px;
         --y: 0px;
         -webkit-user-drag: none;
-        display: flex!important;
+        display: flex;
         height: var(--headerCeilSize);
         width: var(--headerCeilSize);
         justify-content: center;
@@ -257,6 +257,32 @@ div.windows {
         & > div.player {
           zoom: 0.2;
           background-color: rgb(var(--colorFill));
+        }
+      }
+    }
+    &.search {
+      .search-input {
+        & {
+          font-size: 1.5em;
+          display: flex;
+          align-content: center;
+          padding: 0.2em 0;
+        }
+        & > button {
+          border: none;
+        }
+        & > input {
+          font-size: inherit;
+          flex: 1;
+          border: none;
+          background: transparent;
+          outline: none;
+        }
+      }
+      .results {
+        text-align: center;
+        .ui-title {
+          margin: auto;
         }
       }
     }
@@ -478,6 +504,11 @@ footer {
     pointer-events: none;
     transition: var(--animationUI);
   }
+  &-disabled {
+    opacity: 0.5;
+    cursor: default;
+    pointer-events: none;
+  }
 }
 .ui-hrefs a, a[href] {
   color: rgb(var(--colorHref));
@@ -510,11 +541,14 @@ footer {
 // utilities
 .material-icons {
   vertical-align: middle;
+  display: inherit;
+  font-size: inherit;
 }
 h1, h2, h3, h4, h5, h6 {
   margin: 0.5em 0;
   .material-icons {
     font-size: inherit;
+    display: inline-block;
   }
 }
 .icon-list {

@@ -73,7 +73,7 @@ header nav > a {
   --x: 0px;
   --y: 0px;
   -webkit-user-drag: none;
-  display: flex !important;
+  display: flex;
   height: var(--headerCeilSize);
   width: var(--headerCeilSize);
   justify-content: center;
@@ -212,6 +212,28 @@ div.windows > div.window.config div.player-preview {
 div.windows > div.window.config div.player-preview > div.player {
   zoom: 0.2;
   background-color: rgb(var(--colorFill));
+}
+div.windows > div.window.search .search-input {
+  font-size: 1.5em;
+  display: flex;
+  align-content: center;
+  padding: 0.2em 0;
+}
+div.windows > div.window.search .search-input > button {
+  border: none;
+}
+div.windows > div.window.search .search-input > input {
+  font-size: inherit;
+  flex: 1;
+  border: none;
+  background: transparent;
+  outline: none;
+}
+div.windows > div.window.search .results {
+  text-align: center;
+}
+div.windows > div.window.search .results .ui-title {
+  margin: auto;
 }
 div.windows > div.window::-webkit-scrollbar {
   width: var(--tinyScrollbarWidth);
@@ -424,6 +446,11 @@ footer {
   pointer-events: none;
   transition: var(--animationUI);
 }
+.ui-disabled {
+  opacity: 0.5;
+  cursor: default;
+  pointer-events: none;
+}
 
 .ui-hrefs a, a[href] {
   color: rgb(var(--colorHref));
@@ -454,6 +481,8 @@ footer {
 }
 .material-icons {
   vertical-align: middle;
+  display: inherit;
+  font-size: inherit;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -461,6 +490,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 h1 .material-icons, h2 .material-icons, h3 .material-icons, h4 .material-icons, h5 .material-icons, h6 .material-icons {
   font-size: inherit;
+  display: inline-block;
 }
 
 .icon-list > li {
