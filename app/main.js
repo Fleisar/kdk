@@ -11,7 +11,7 @@ $(function(){
             '<span class="material-icons icon">info</span>Информация',
             {text:'<span class="material-icons icon">favorite</span>Любимое',action:'stay'},
             '<span class="material-icons icon">content_copy</span>Скопировать название',
-            {text:'<span class="icon" style="background-color:rgba(var(--colorFill),0.5)"><img src="https://shikimori.one/assets/layouts/l-top_menu-v2/glyph.svg" height="24"></span>Открыть в Shikimori',classes:['externalLink']}
+            {text:'<span class="icon" style="background-color:rgba(var(--colorFill),0.5)"><img alt="sk" src="https://shikimori.one/assets/layouts/l-top_menu-v2/glyph.svg" height="24"></span>Открыть в Shikimori',classes:['externalLink']}
         ],{classes:['icon-list','ui-hovermenu']}),
         config: new configCollector()
     }
@@ -43,7 +43,7 @@ $(function(){
     let collections = {
         title(id,poster,name,original_name,data){
             return `
-                <a data-page="player" href="#player/shikimori/${id}">
+                <a data-page="player" href="#player/shikimori/${id}" title="${original_name}">
                     <div class="ui-title" data-add='${JSON.stringify(data)}'>
                         <img alt="${original_name}" class="lazy" data-src="//shikimori.one${poster}">
                         <div></div>
@@ -53,12 +53,12 @@ $(function(){
         },
         titleEx(id,poster,name,original_name,data){
             return `
-                <a data-page="player" href="#player/shikimori/${id}">
+                <a data-page="player" href="#player/shikimori/${id}" title="${original_name}">
                     <div>
                         <div class="ui-title" data-add='${JSON.stringify(data)}'>
                             <img alt="${original_name}" class="lazy" data-src="//shikimori.one${poster}">
                         </div>
-                        <span title="${original_name}">${name||original_name}</span>
+                        <span>${name||original_name}</span>
                     </div>
                 </a>
             `
@@ -82,6 +82,7 @@ $(function(){
             case 'colorText': return body.css('--colorText',toRGB(v).join(', '))
             case 'colorFill': return body.css('--colorFill',toRGB(v).join(', '))
             case 'colorHref': return body.css('--colorHref',toRGB(v).join(', '))
+            case 'highEffects': return body.attr('highEffects',v.toString())
             case 'playerMode':
                 $('div.page.player, div.window.config div.player-preview').attr('playerMode', v)
                 break;
@@ -121,10 +122,10 @@ $(function(){
                 console.log(data)
             },
             search: () => {
-                $('.window.search .search-input>input[type=text]').unbind('keypress').keypress(e=>{
+                $('.window.search .search-input>input[type=text]').focus().unbind('keypress').keypress(e=>{
                     if(e.key === 'Enter') workers.search.search($('.window.search input[type=text]').val())
                 })
-                $('.window.search .search-input>button').unbind('click').click(e=>{
+                $('.window.search .search-input>button').unbind('click').click(()=>{
                     workers.search.search($('.window.search input[type=text]').val())
                 })
             }
@@ -160,21 +161,8 @@ $(function(){
                 state: null,
                 shikimori: shikimori.animes(),
                 main(){
-                    let tile = {}
                     $('main>.vcontainer').html('')
                     this._scrollUpdate()
-                    binds.titleHover.on('click',n=>{
-                        console.log(n,tile)
-                        switch (Number(n)) {
-                            case 0: return url.set('#player/shikimori/'+tile.id,{})
-                            case 1: break
-                            case 2: break
-                            case 3: return window.open('https://shikimori.one/animes/'+tile.id)
-                        }
-                    }).on('open',e=>{
-                        tile = JSON.parse($(e.delegateTarget).attr('data'))
-                        console.log(tile)
-                    })
                 },
                 update(){},
                 load(page=1){
@@ -182,7 +170,7 @@ $(function(){
                     this.shikimori.page(page).then(r=>{
                         if(r.length===0) return $('.page.general div.all').append(collections.noResults('Не удалось загрузить больше.'))
                         r.forEach(t=>{
-                            $('.page.general div.all').append(collections.title(t.id,t.image.preview,t.russian||t.name,t.name))
+                            $('.page.general div.all').append(collections.title(t.id,t.image.preview,t.russian||t.name,t.name,t))
                         })
                         App.loaded()
                         this.state = null
@@ -222,15 +210,18 @@ $(function(){
                 setPlayer(name,id){
                     this._title = name.toString()+id.toString()
                     $('.page.player .player-'+this._current).hide()
+                    let players = {
+                        kodik: $('.page.player .player-kodik')
+                    }
                     switch (name){
                         case 'animetop': break;
                         case 'shikimori':
-                            $('.page.player .player-kodik').show()
+                            players.kodik.show()
                             this.players.kodik.setShikimori(id)
                             break;
                         case 'kodik':
                         default:
-                            $('.page.player .player-kodik').show()
+                            players.kodik.show()
                             this.players.kodik.setVideo(id)
                             break;
 
@@ -269,6 +260,10 @@ $(function(){
                 })
             }
         },
+        favorite: {
+            init(){},
+            toggle(data){},
+        },
         clock: {
             set(){
                 let date = new Date()
@@ -290,8 +285,30 @@ $(function(){
                     case 'alt+s': windows.open('search'); break;
                 }
             })
+        },
+        metric: {
+            state: false,
+            init(){
+                this.state = Boolean(binds.config._value('collectInformation'))
+            }
+        },
+        hoverMenu(){
+            binds.titleHover.on('click',n=>{
+                console.log(n,tile)
+                switch (Number(n)) {
+                    case 0: return url.set('#player/shikimori/'+tile.id,{})
+                    case 1: return windows.open('titleAbout',tile)
+                    case 2: return workers.favorite.toggle(tile)
+                    case 3: return navigator.clipboard.writeText(tile.name)
+                    case 4: return window.open('https://shikimori.one/animes/'+tile.id)
+                }
+            }).on('open',e=>{
+                tile = JSON.parse(e.delegateTarget.dataset.add||"{}")
+                console.log(tile)
+            })
         }
     }
+    workers.hoverMenu()
     workers.hotkeys()
     workers.clock.set()
     App.chrome.sw()
