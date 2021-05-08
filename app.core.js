@@ -81,10 +81,6 @@
             return App.info.update.release = Math.floor((new Date()).getTime()/1e3), this
         },
         chrome: {
-            generatePackage(){
-                let blob = new Blob([`<html><head><link rel="manifest" href="${location.origin+location.pathname+App.info.application.manifest}"></head></html>`],{type:'text/html'})
-                window.open(URL.createObjectURL(blob))
-            },
             sw(){
                 if (navigator.serviceWorker.controller) {
                     console.log('[PWA Builder] active service worker found, no need to register')
@@ -124,7 +120,7 @@
         },
         _checkUpdate(manifest,handler){
             this._downloadManifest(manifest||this.DEFAULT_MANIFEST,r=>{
-                handler(r,r.update.release<=App.info.update.release)
+                handler(r,r.update.release<=App.info.update.release&&r.update.type!=='release')
             })
         },
         _load: {
