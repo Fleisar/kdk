@@ -120,7 +120,7 @@
         },
         _checkUpdate(manifest,handler){
             this._downloadManifest(manifest||this.DEFAULT_MANIFEST,r=>{
-                handler(r,r.update.release<=App.info.update.release&&r.update.type!=='release')
+                handler(r,r.update.type==='release'?r.update.release<=App.info.update.release:true)
             })
         },
         _load: {
