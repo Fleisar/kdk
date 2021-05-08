@@ -32,7 +32,7 @@
             return $(this.selector).unbind('contextmenu').on('contextmenu',e=>{
                 this.open(e.pageX,e.pageY)
                 this._call(this._keeper.open,[e])
-                return e.preventDefault()
+                return e.preventDefault(), false
             }), this
         },
         _hBind(){
