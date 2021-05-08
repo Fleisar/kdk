@@ -13,8 +13,8 @@
                     this._keeper.update.length>0&&this._keeper.update.forEach(f=>f(k,this.config[k]))
                     let e = $(`.${this.class}[name=${k}]`)
                     console.log(e)
-                    switch(e.tagName){
-                        case 'INPUT': if(e.type === 'checkbox') return e.prop('checked',this.config[k])
+                    switch(e[0].tagName){
+                        case 'INPUT': if(e[0].type === 'checkbox') return e.prop('checked',this.config[k])
                         case 'SELECT':
                         default: return e.val(this.config[k])
                     }
