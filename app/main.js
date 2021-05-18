@@ -13,7 +13,8 @@ $(function(){
             '<span class="material-icons icon">content_copy</span>Скопировать название',
             {text:'<span class="icon" style="background-color:rgba(var(--colorFill),0.5)"><img alt="sk" src="https://shikimori.one/assets/layouts/l-top_menu-v2/glyph.svg" height="24"></span>Открыть в Shikimori',classes:['externalLink']}
         ],{classes:['icon-list','ui-hovermenu']}),
-        config: new configCollector()
+        config: new configCollector(),
+        anilibria: new Anilibria()
     }
     $(function(){
         binds.hover.bind(function(e){
@@ -50,6 +51,12 @@ $(function(){
                     </div>
                 </a>
             `
+        },
+        textTitle(text){
+            return `<h2>${text}</h2>`
+        },
+        minTitle(name,time,from){
+            return `<div class="ui-min-title" style="--from:'${from}'" title="Время: ${time}"><h4>${name}</h4></div>`
         },
         titleEx(id,poster,name,original_name,data){
             return `
@@ -118,8 +125,8 @@ $(function(){
             config: () => {
 
             },
-            player: data => {
-                console.log(data)
+            'title-info': title => {
+                console.log(title)
             },
             search: () => {
                 $('.window.search .search-input>input[type=text]').focus().unbind('keypress').keypress(e=>{
@@ -128,6 +135,54 @@ $(function(){
                 $('.window.search .search-input>button').unbind('click').click(()=>{
                     workers.search.search($('.window.search input[type=text]').val())
                 })
+            },
+            releases: () => {
+                let select = $('.releases-filter')
+                let container = $('.window.releases .results')
+                let results = [[],[],[],[],[],[],[]]
+                let titles = [
+                    'Понедельник',
+                    'Вторник',
+                    'Среда',
+                    'Четверг',
+                    'Пятница',
+                    'Суббота',
+                    'Воскресенье'
+                ]
+                select.unbind('change').change(()=>load(select.val()))
+                let onload = () => {
+                    container.html('')
+                    results.forEach((t,d)=>{
+                        container.append(collections.textTitle(titles[d]))
+                        t.forEach(i=>{
+                            container.append(collections.minTitle(i.name,i.time,i.from))
+                        })
+                    })
+                }
+                let load = (order) => {
+                    container.html(collections.loadingResults())
+                    switch (order){
+                        case 'animevost':
+                            workers.schedule.animevost().then(r=>{
+                                results = r
+                                onload()
+                            })
+                            break;
+                        case 'anilibria':
+                            workers.schedule.anilibria().then(r=>{
+                                results = r
+                                onload()
+                            })
+                            break;
+                        default:
+                            workers.schedule.all().then(r=>{
+                                results = r
+                                onload()
+                            })
+                            break;
+                    }
+                }
+                load(select.val())
             }
         }
     }
@@ -252,7 +307,7 @@ $(function(){
                     this.dom.results.html('')
                     if(r.length===0)$('.window.search .results').html(collections.noResults())
                     r.forEach(t=>{
-                        this.dom.results.append(collections.titleEx(t.id,t.image.preview,t.russian||t.name,t.name))
+                        this.dom.results.append(collections.titleEx(t.id,t.image.preview,t.russian||t.name,t.name,t))
                     })
                     binds.titleHover.update()
                     binds.lazyLoad.update()
@@ -297,7 +352,7 @@ $(function(){
                 console.log(n,tile)
                 switch (Number(n)) {
                     case 0: return url.set('#player/shikimori/'+tile.id,{})
-                    case 1: return windows.open('titleAbout',tile)
+                    case 1: return windows.open('title-info',tile)
                     case 2: return workers.favorite.toggle(tile)
                     case 3: return navigator.clipboard.writeText(tile.name)
                     case 4: return window.open('https://shikimori.one/animes/'+tile.id)
@@ -306,6 +361,58 @@ $(function(){
                 tile = JSON.parse(e.delegateTarget.dataset.add||"{}")
                 console.log(tile)
             })
+        },
+        schedule: {
+            _cache: {},
+            async animevost(){
+                let result = [[],[],[],[],[],[],[]]
+                if(this._cache.animevost!==undefined)
+                    return this._cache.animevost
+                await animetop.timetable().then((r,e)=>{
+                    if(e!==undefined)return err(e)
+                    r.forEach(i=>{
+                        result[i.day].push({
+                            name: i.name,
+                            time: i.time,
+                            from: 'AnimeVost'
+                        })
+                    })
+                })
+                return this._cache.animevost=result
+            },
+            async anilibria(){
+                let result = [[],[],[],[],[],[],[]]
+                if(this._cache.anilibria!==undefined)
+                    return this._cache.anilibria
+                await binds.anilibria.getSchedule().then((r,e)=>{
+                    if(e!==undefined)return err(e)
+                    r.forEach((data,day)=>{
+                        data.list.forEach(i=>{
+                            result[day].push({
+                                name: i.names.ru,
+                                time: 'неизвестно',
+                                from: 'Anilibria'
+                            })
+                        })
+                    })
+                })
+                return this._cache.anilibria=result
+            },
+            _list: ['animevost','anilibria'],
+            all(){
+                return new Promise(res=>{
+                    let results = [[],[],[],[],[],[],[]]
+                    this._list.forEach((a,i)=>{
+                        this[a]().then(r=>{
+                            r.forEach((d,i)=>{
+                                results[i]=results[i].concat(d)
+                            })
+                            if(i===this._list.length-1)
+                                return res(results), console.log(results,r)
+                        })
+                    })
+                })
+            }
         }
     }
     workers.hoverMenu()
@@ -313,5 +420,6 @@ $(function(){
     workers.clock.set()
     App.chrome.sw()
     windows.bind()
+    window.workers = workers
     console.log('KDK Anime v3.0.28.2259')
 })
