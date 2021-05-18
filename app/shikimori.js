@@ -15,10 +15,15 @@
         },
         _asp: {
             value: {},
+            _reset: false,
             DEF: {
                 limit: 50,
                 order: 'ranked',
                 status: 'ongoing'
+            },
+            reset(){
+                this.value = {}
+                return this
             },
             page(num){
                 if(typeof num !== 'number') return this.value.page||0
