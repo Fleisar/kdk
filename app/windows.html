@@ -1,18 +1,29 @@
 <div class="windows" spellcheck="false">
     <div class="main-window">
         <div class="window search">
-            <div class="search-box">
+            <div class="search-box ui-sticky-win">
                 <div class="search-input">
                     <button class="material-icons">search</button>
                     <input placeholder="Поиск" type="text" maxlength="50">
                 </div>
                 <hr>
             </div>
-            <div class="ui-grid results"></div>
+            <div class="ui-grid results allow-select"></div>
         </div>
         <div class="window releases">
-            <h2><i class="material-icons">today</i> Расписание релизов</h2>
-            <hr>
+            <div class="ui-sticky-win">
+                <h2><i class="material-icons">today</i> Расписание релизов</h2>
+                <div class="ui-select w-100">
+                    <select class="releases-filter">
+                        <option value="" selected>Все</option>
+                        <option value="animevost">Animevost</option>
+                        <option value="anilibria">Anilibria</option>
+                    </select>
+                    <i class="material-icons">expand_more</i>
+                </div>
+                <hr>
+            </div>
+            <div class="ui-grid results allow-select"></div>
         </div>
         <div class="window config">
             <h2><i class="material-icons">settings</i> Настройки</h2>
@@ -31,7 +42,7 @@
                     <input id="rJQ4NcsN" type="checkbox" name="showTime" class="ui-switch config-collector">
                     <label for="rJQ4NcsN">Показыввать локальное время на сайте</label>
                 </div>
-                <div class="ui-disabled">
+                <div>
                     <input id="Gnxy6Rh2" type="checkbox" name="showReleases" class="ui-switch config-collector">
                     <label for="Gnxy6Rh2">Показывать расписание релизов</label>
                 </div>
