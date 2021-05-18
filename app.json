@@ -1,5 +1,5 @@
 {
-  "dev_mode": 1,
+  "dev_mode": 0,
   "short_name": "KDK",
   "name": "KDK Anime",
   "logo": "app/logo.svg",
@@ -12,7 +12,7 @@
   "update": {
     "release": 0,
     "type": "dev",
-    "version": "3.0-beta",
+    "version": "3.01-beta",
     "description": ""
   },
   "update_policy": {
@@ -73,6 +73,10 @@
     },
     {
       "url": "app/animetop.js",
+      "type": "script"
+    },
+    {
+      "url": "app/anilibria.js",
       "type": "script"
     },
     {
