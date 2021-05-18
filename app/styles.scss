@@ -97,11 +97,11 @@ body {
         transform: perspective(300px) rotateY(4deg) scale(0.9) translateY(5px);
         animation: 5s var(--animationUI) windows-breathing infinite;
         transition: var(--animationUI);
+        box-shadow: 0 0 10px 0 #000;
+        border-radius: 1em;
+        overflow: hidden;
         &::before {
           background: linear-gradient(rgb(var(--colorBackground)) 5px, transparent 20px, transparent calc(100% - 20px), rgb(var(--colorBackground)) calc(100% - 5px));
-        }
-        & > .window {
-          box-shadow: 0 0 10px 0 #000;
         }
       }
     }
@@ -320,15 +320,6 @@ div.windows {
       }
       &.search {
         .search-box {
-          & {
-            position: sticky;
-            margin-top: calc(0px - max(min(5vh, 5vw), 1em));
-            padding-top: max(min(5vh, 5vw), 1em);
-            padding-bottom: 1em;
-            top: calc(0px - max(min(5vh, 5vw), 1em));
-            z-index: 1;
-            background-color: rgb(var(--colorBackground));
-          }
           .search-input {
             & {
               font-size: 1.5em;
@@ -340,11 +331,16 @@ div.windows {
               border: none;
             }
             & > input {
-              font-size: inherit;
-              flex: 1;
-              border: none;
-              background: transparent;
-              outline: none;
+              & {
+                font-size: inherit;
+                flex: 1;
+                border: none;
+                background: transparent;
+                outline: none;
+              }
+              &:focus {
+                text-shadow: 0 0 10px rgb(var(--colorText));
+              }
             }
           }
         }
@@ -597,6 +593,7 @@ footer {
     }
     & > select {
       & {
+        width: 100%;
         outline: none;
         appearance: none;
         border: var(--borderUI) solid rgb(var(--colorFill));
@@ -615,6 +612,35 @@ footer {
         background-color: rgb(var(--colorBackground));
       }
     }
+  }
+  &-min-title {
+    & {
+      border: var(--borderUI) solid rgb(var(--colorFill));
+      border-radius: 1em;
+      padding: 1em;
+      position: relative;
+      overflow: hidden;
+    }
+    &::before {
+      top: 0;
+      left: 0;
+      position: absolute;
+      text-align: center;
+      background-color: rgb(var(--colorFill));
+      color: rgb(var(--colorBackground));
+      width: 100%;
+      font-size: small;
+      content: var(--from);
+    }
+  }
+  &-sticky-win {
+    position: sticky;
+    margin-top: calc(0px - max(min(5vh, 5vw), 1em));
+    padding-top: max(min(5vh, 5vw), 1em);
+    padding-bottom: 0.5em;
+    top: calc(0px - max(min(5vh, 5vw), 1em));
+    z-index: 1;
+    background-color: rgb(var(--colorBackground));
   }
 }
 .ui-hrefs a, a[href] {
@@ -717,6 +743,15 @@ hr {
   border: none;
   height: var(--borderUI);
   background-color: rgb(var(--colorFill));
+}
+.w-100 {
+  width: 100%;
+}
+.h-100 {
+  height: 100%;
+}
+.allow-select {
+  user-select: text;
 }
 *[display=false] {
   display: none!important;
