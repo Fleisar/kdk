@@ -1,0 +1,32 @@
+@media (orientation: portrait) {
+  body {
+    --headerWidth: 100%;
+    --headerHeight: 50px;
+
+    --pageLeft: 0;
+    --pageWidth: 100%;
+    --pageHeight: calc(var(--vh) * 100 - var(--headerHeight) - var(--footerHeight));
+    --pageBottom: var(--headerHeight);
+  }
+
+  header {
+    top: auto;
+    bottom: var(--footerHeight);
+    & > nav {
+      flex-direction: row;
+      & > a:first-child {
+        display: none;
+      }
+    }
+  }
+  div.windows > .main-window {
+    width: var(--pageWidth);
+  }
+}
+.ui-hovermenu {
+  bottom: var(--footerHeight);
+  top: auto!important;
+  left: 0!important;
+  width: 100%;
+  font-size: larger;
+}
