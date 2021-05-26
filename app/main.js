@@ -9,10 +9,10 @@ $(function(){
         titleHover: new hoverMenu('.ui-title',[
             'Открыть',
             '<span class="material-icons icon">info</span>Информация',
-            {text:'<span class="material-icons icon">favorite</span>Любимое',action:'stay'},
+            {text:'<span class="material-icons icon">favorite</span>Любимое',action:'stay',classes:['ui-disabled']},
             '<span class="material-icons icon">content_copy</span>Скопировать название',
             {text:'<span class="icon" style="background-color:rgba(var(--colorFill),0.5)"><img alt="sk" src="https://shikimori.one/assets/layouts/l-top_menu-v2/glyph.svg" height="24"></span>Открыть в Shikimori',classes:['externalLink']}
-        ],{classes:['icon-list','ui-hovermenu']}),
+        ],{classes:['icon-list','ui-hovermenu','ui-material-list']}),
         config: new configCollector(),
         anilibria: new Anilibria()
     }
@@ -56,7 +56,7 @@ $(function(){
             return `<h2>${text}</h2>`
         },
         minTitle(name,time,from){
-            return `<div class="ui-min-title" style="--from:'${from}'" title="Время: ${time}"><h4>${name}</h4></div>`
+            return `<a data-window="search" data-add='{"text":"${name}"}'><div class="ui-min-title" style="--from:'${from}'" title="Время: ${time}"><h4>${name}</h4></div></a>`
         },
         titleEx(id,poster,name,original_name,data){
             return `
@@ -68,6 +68,48 @@ $(function(){
                         <span>${name||original_name}</span>
                     </div>
                 </a>
+            `
+        },
+        titleInfo(data){
+            return `
+                <div class="ui-title" data-add='${JSON.stringify(data)}' style="margin:auto">
+                    <img alt="${data.name}" src="//shikimori.one${data.image.original}">
+                </div>
+                <h2 style="margin:auto" title="${data.name}">${data.russian||data.name} [${data.kind}]</h2>
+                <hr/>
+                <table class="ui-table-v">
+                    <tbody>
+                        <tr>
+                            <td>Статус</td>
+                            <td>${data.status||'Неизвестно'}</td>
+                        </tr>
+                        <tr>
+                            <td>Рейтинг</td>
+                            <td>${data.score}</td>
+                        </tr>
+                        <tr>
+                            <td>Анонсирован</td>
+                            <td>${data.aired_on||'Неизвестно'}</td>
+                        </tr>
+                        <tr>
+                            <td>Закончен</td>
+                            <td>${data.released_on||'Неизвестно'}</td>
+                        </tr>
+                        <tr>
+                            <td>Оригинал</td>
+                            <td>${data.name}</td>
+                        </tr>
+                        <tr>
+                            <td>Эпизоды</td>
+                            <td>${data.episodes_aired}/${data.episodes}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <ui class="icon-list ui-material-list">
+                    <li onclick="url.set('#player/shikimori/${data.id}',{})">Открыть</li>
+                    <li class="ui-disabled"><span class="material-icons icon">favorite</span>Любимое</li>
+                    <li onclick="window.open('//shikimori.one${data.url}')"><span class="icon" style="background-color:rgba(var(--colorFill),0.5)"><img alt="sk" src="https://shikimori.one/assets/layouts/l-top_menu-v2/glyph.svg" height="24"></span>Открыть в Shikimori</li>
+                </ui>
             `
         },
         loadingResults(){
@@ -101,8 +143,9 @@ $(function(){
         current: null,
         bind(){
             binds.aWindow.bind(e=>{
-                let data = JSON.parse(e.currentTarget.dataset.add||"{}")
-                    ,name = e.target.dataset.window
+                let data = JSON.parse(e.delegateTarget.dataset.add||"{}")
+                    ,name = e.delegateTarget.dataset.window
+
                 if(name===this.current&&this.container) return this.close()
                 return this.open(name,data)
             },'windows.bind')
@@ -127,10 +170,15 @@ $(function(){
             },
             'title-info': title => {
                 console.log(title)
+                $('.windows .window.title-info .ui-grid').html(collections.titleInfo(title))
             },
-            search: () => {
+            search: data => {
+                if(data.text) {
+                    $('.window.search input[type=text]').val(data.text)
+                    workers.search.search(data.text)
+                }
                 $('.window.search .search-input>input[type=text]').focus().unbind('keypress').keypress(e=>{
-                    if(e.key === 'Enter') workers.search.search($('.window.search input[type=text]').val())
+                    if(e.key === 'Enter' || ($('.window.search input[type=text]').val().length>=3&&binds.config.config.realtimeSearch)) workers.search.search($('.window.search input[type=text]').val())
                 })
                 $('.window.search .search-input>button').unbind('click').click(()=>{
                     workers.search.search($('.window.search input[type=text]').val())
@@ -158,6 +206,7 @@ $(function(){
                             container.append(collections.minTitle(i.name,i.time,i.from))
                         })
                     })
+                    binds.aWindow.update()
                 }
                 let load = (order) => {
                     container.html(collections.loadingResults())
@@ -264,6 +313,9 @@ $(function(){
                 },
                 setPlayer(name,id){
                     this._title = name.toString()+id.toString()
+                    shikimori.anime(id).then(r=>{
+                        this._data = r
+                    })
                     $('.page.player .player-'+this._current).hide()
                     let players = {
                         kodik: $('.page.player .player-kodik')
@@ -291,7 +343,7 @@ $(function(){
                     }
                 },
                 unload(){
-                    $('header>nav>a.player-show').show()
+                    $('header>nav>a.player-show').show().attr('title',this._data.russian||this._data.name||'Плеер')
                 }
             }
         }
@@ -324,8 +376,10 @@ $(function(){
                 let date = new Date()
                 $('.ui-clock').text((date.getHours()>9?date.getHours():'0'+date.getHours())+':'+(date.getMinutes()>9?date.getMinutes():'0'+date.getMinutes()))
                 window.clock = setInterval(function(){
-                    let date = new Date()
-                    $('.ui-clock').text((date.getHours()>9?date.getHours():'0'+date.getHours())+':'+(date.getMinutes()>9?date.getMinutes():'0'+date.getMinutes()))
+                    let date = new Date(),
+                        elem = $('.ui-clock'),
+                        format = (date.getHours()>9?date.getHours():'0'+date.getHours())+':'+(date.getMinutes()>9?date.getMinutes():'0'+date.getMinutes())
+                    if(elem.text()!==format)elem.text(format)
                 },1e3)
             }
         },
@@ -355,7 +409,7 @@ $(function(){
                     case 1: return windows.open('title-info',tile)
                     case 2: return workers.favorite.toggle(tile)
                     case 3: return navigator.clipboard.writeText(tile.name)
-                    case 4: return window.open('https://shikimori.one/animes/'+tile.id)
+                    case 4: return window.open('https://shikimori.one'+tile.url)
                 }
             }).on('open',e=>{
                 tile = JSON.parse(e.delegateTarget.dataset.add||"{}")
@@ -408,13 +462,17 @@ $(function(){
                                 results[i]=results[i].concat(d)
                             })
                             if(i===this._list.length-1)
-                                return res(results), console.log(results,r)
+                                return res(results)
                         })
                     })
                 })
             }
+        },
+        styles(){
+            document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
         }
     }
+    workers.styles()
     workers.hoverMenu()
     workers.hotkeys()
     workers.clock.set()
