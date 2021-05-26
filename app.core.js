@@ -82,6 +82,7 @@
         },
         chrome: {
             sw(){
+                if(window.location.protocol!=='https:')return false
                 if (navigator.serviceWorker.controller) {
                     console.log('[PWA Builder] active service worker found, no need to register')
                 } else {
@@ -152,7 +153,7 @@
         _saveConfig(){localStorage.setItem('Application',JSON.stringify(App.info))},
         _downloadManifest(manifest,callback){
             if(!this._checkTypes([manifest,callback],['string','function'])) throw `Invalid input variables`
-            fetch(manifest).then(r=>{
+            fetch(manifest+"?"+(new Date()).getTime()).then(r=>{
                 if(r.ok) r.json().then(j=>callback(j))
                 else throw `Unable to download manifest`
             })
