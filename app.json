@@ -1,5 +1,5 @@
 {
-  "dev_mode": 0,
+  "dev_mode": 1,
   "short_name": "KDK",
   "name": "KDK Anime",
   "logo": "app/logo.svg",
@@ -29,6 +29,10 @@
     },
     {
       "url": "app/styles.css",
+      "type": "style"
+    },
+    {
+      "url": "app/media.css",
       "type": "style"
     },
     {
@@ -65,6 +69,10 @@
     },
     {
       "url": "app/uri.js",
+      "type": "script"
+    },
+    {
+      "url": "app/kodik.js",
       "type": "script"
     },
     {
