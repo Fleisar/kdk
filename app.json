@@ -64,6 +64,10 @@
       "type": "script"
     },
     {
+      "url": "app/listStorage.js",
+      "type": "script"
+    },
+    {
       "url": "app/configCollector.js",
       "type": "script"
     },
