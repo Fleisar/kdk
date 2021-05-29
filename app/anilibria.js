@@ -20,8 +20,8 @@
         Object.keys(this._allowedKeys).forEach(m=>{
             this[m] = function(options={}){
                 Object.keys(options).forEach(k=>{
-                    if(!(k instanceof this._allowedKeys.getTitle)) throw `Invalid key ${k} in ${m}`
-                    if(typeof options[k] !== this._allowedKeys.getTitle[k]) throw `Invalid type of ${k}(${typeof options[k]}) in ${m}`
+                    if(!(k in this._allowedKeys[m])) throw `Invalid key ${k} in ${m}`
+                    if(typeof options[k] !== this._allowedKeys[m][k]) throw `Invalid type of ${k}(${typeof options[k]}) in ${m}`
                 })
                 return this._request(m,{method:this._methods[m]||'get',data:{...options,...(this.session!==undefined?{session:this.session}:{})}})
             }
