@@ -69,16 +69,14 @@
                 this.value.rating = rating
                 return this
             },
-            genre(genre1,genre2,genre3){
-                let args = arguments
-                args.forEach(arg=>{if(typeof arg !== 'number')throw`Genre id must be a number`})
-                this.value.genre = args
+            genre(genres){
+                genres.forEach(arg=>{if(typeof arg !== 'number')throw`Genre id must be a number`})
+                this.value.genre = genres
                 return this
             },
-            studio(studio1,studio2,studio3){
-                let args = arguments
-                args.forEach(arg=>{if(typeof arg !== 'number')throw`Studio id must be a number`})
-                this.value.studio = args
+            studio(studios){
+                studios.forEach(arg=>{if(typeof arg !== 'number')throw`Studio id must be a number`})
+                this.value.studio = studios
                 return this
             },
             franchise(franchise1,franchise2,franchise3){
@@ -89,10 +87,9 @@
                 this.value.censored = Boolean(state)
                 return this
             },
-            ids(id1,id2,id3){
-                let args = arguments
-                args.forEach(arg=>{if(typeof arg !== 'number')throw`Id must be a number`})
-                this.value.ids = args
+            ids(ids){
+                ids.forEach(arg=>{if(typeof arg !== 'number')throw`Id must be a number`})
+                this.value.ids = ids
                 return this
             },
             exclude_ids(){
