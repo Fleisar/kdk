@@ -2,13 +2,13 @@ body {
   --footerHeight: 11px;
   --footerWidth: 100vw;
   --headerWidth: 50px;
-  --headerHeight: calc(100vh - var(--footerHeight));
+  --headerHeight: calc(var(--vh) * 100 - var(--footerHeight));
   --headerCeilSize: min(var(--headerWidth),var(--headerHeight));
   --titleWidth: 225px;
   --titleHeight: 318px;
   --titleGap: 8px;
   --pageWidth: calc(100vw - var(--headerWidth));
-  --pageHeight: calc(100vh - var(--footerHeight));
+  --pageHeight: calc(var(--vh) * 100 - var(--footerHeight));
   --pageLeft: var(--headerWidth);
   --pageBottom: 0;
   --scrollbarWidth: 20px;
@@ -173,22 +173,26 @@ div.page::-webkit-scrollbar-thumb {
   border-bottom: none;
 }
 
-div.page.player .player, div.window.config div.player-preview .player {
+div.page.player > .player, div.page.player > .player > iframe.player, div.window.config div.player-preview > .player, div.window.config div.player-preview > .player > iframe.player {
   border: none;
   transition: var(--animationUI);
 }
-div.page.player[playerMode=cinema] .player, div.window.config div.player-preview[playerMode=cinema] .player {
+div.page.player > .player > iframe.player, div.window.config div.player-preview > .player > iframe.player {
+  width: 100%;
+  height: calc(100% - 2em);
+}
+div.page.player[playerMode=cinema] > .player, div.window.config div.player-preview[playerMode=cinema] > .player {
   width: 100%;
   height: 60%;
 }
-div.page.player[playerMode=fullscreen] .player, div.window.config div.player-preview[playerMode=fullscreen] .player {
+div.page.player[playerMode=fullscreen] > .player, div.window.config div.player-preview[playerMode=fullscreen] > .player {
   width: 100%;
-  height: calc(100% - 50px);
+  height: 100%;
 }
 div.page.player[playerMode=windowed], div.window.config div.player-preview[playerMode=windowed] {
   display: flex !important;
 }
-div.page.player[playerMode=windowed] .player, div.window.config div.player-preview[playerMode=windowed] .player {
+div.page.player[playerMode=windowed] > .player, div.window.config div.player-preview[playerMode=windowed] > .player {
   width: 720px;
   margin: auto;
   height: 480px;
@@ -273,10 +277,10 @@ div.windows > .main-window > div.window.search .search-box .search-input > input
 div.windows > .main-window > div.window.search .search-box .search-input > input:focus {
   text-shadow: 0 0 10px rgb(var(--colorText));
 }
-div.windows > .main-window > div.window.search .results {
+div.windows > .main-window > div.window.search .results, div.windows > .main-window > div.window.history .results, div.windows > .main-window > div.window.favorite .results {
   text-align: center;
 }
-div.windows > .main-window > div.window.search .results .ui-title {
+div.windows > .main-window > div.window.search .results .ui-title, div.windows > .main-window > div.window.history .results .ui-title, div.windows > .main-window > div.window.favorite .results .ui-title {
   margin: auto;
 }
 div.windows > .main-window > div.window::-webkit-scrollbar {
@@ -442,6 +446,19 @@ footer {
   font-size: small;
   content: var(--from);
 }
+.ui-bar {
+  display: flex;
+  height: 1.6em;
+  align-items: center;
+  padding: 0 0.5em;
+  box-sizing: border-box;
+}
+.ui-bar > a {
+  cursor: pointer;
+}
+.ui-bar > * {
+  margin: auto 0.1em;
+}
 .ui-load, .ui-error {
   height: 300px;
   display: flex;
@@ -453,7 +470,7 @@ footer {
 .ui-load > div > span, .ui-error > div > span {
   font-size: xxx-large;
 }
-.ui-load > div > span {
+.ui-load span {
   animation: load-animation 1s infinite;
 }
 .ui-switch {
@@ -576,7 +593,45 @@ footer {
   color: var(--colorText);
   background-color: rgb(var(--colorBackground));
 }
-
+.ui-key {
+  border: var(--borderUI) solid rgb(var(--colorFill));
+  box-shadow: inset 0 calc(0px - var(--borderUI) * 2) 0 0 rgb(var(--colorFill));
+  color: rgb(var(--colorFill));
+  padding: 0.1em 0.1em calc(0.1em + var(--borderUI));
+  font-style: normal;
+  display: inline;
+  font-weight: bold;
+  border-radius: 0.2em;
+  margin: auto 0.1em;
+}
+.ui-progress {
+  height: 1em;
+  position: relative;
+  overflow: hidden;
+  border-radius: 1em;
+  border: var(--borderUI) solid rgb(var(--colorFill));
+}
+.ui-progress > div {
+  background-color: #f00;
+  height: 100%;
+  display: inline-block;
+  width: calc(100% * var(--part));
+  filter: hue-rotate(var(--color));
+  opacity: 0.5;
+}
+.ui-progress-part::before {
+  content: "";
+  width: 1em;
+  height: 1em;
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 0.5em;
+  border-radius: 1em;
+  background-color: #f00;
+  filter: hue-rotate(var(--color));
+  opacity: 0.5;
+  border: var(--borderUI) solid rgb(var(--colorFill));
+}
 .ui-hrefs a, a[href] {
   color: rgb(var(--colorHref));
   cursor: pointer;
@@ -668,6 +723,20 @@ button:not([disabled]):hover {
 }
 button[disabled] {
   opacity: 0.5;
+}
+button[busy] {
+  color: rgba(var(--colorText), 0.2);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+button[busy]::before {
+  content: "autorenew";
+  font-family: "Material Icons", sans-serif;
+  position: absolute;
+  color: rgb(var(--colorText));
+  font-size: x-large;
+  animation: load-animation 1s infinite;
 }
 
 hr {

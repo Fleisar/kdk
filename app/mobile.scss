@@ -19,8 +19,19 @@
       }
     }
   }
-  div.windows > .main-window {
-    width: var(--pageWidth);
+  div.windows {
+    &::before {
+      content: 'close';
+      font-family: "Material Icons",sans-serif;
+      position: fixed;
+      right: 10px;
+      font-size: xx-large;
+      top: 10px;
+      z-index: 1;
+    }
+    & > .main-window {
+      width: var(--pageWidth);
+    }
   }
 }
 .ui-hovermenu {
