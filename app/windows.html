@@ -8,7 +8,7 @@
                 </div>
                 <hr>
             </div>
-            <div class="ui-grid results allow-select"></div>
+            <div class="ui-grid results"></div>
         </div>
         <div class="window releases">
             <div class="ui-sticky-win">
@@ -46,7 +46,7 @@
                     <input id="Gnxy6Rh2" type="checkbox" name="showReleases" class="ui-switch config-collector">
                     <label for="Gnxy6Rh2">Показывать расписание релизов</label>
                 </div>
-                <div class="ui-disabled">
+                <div>
                     <input id="5QCpQWnW" type="checkbox" name="showHistory" class="ui-switch config-collector">
                     <label for="5QCpQWnW">Показывать историю просмотров</label>
                 </div>
@@ -75,7 +75,6 @@
                 <input type="color" name="colorBG" style="--text:'Фон'" class="ui-color config-collector" value="#f0f0f0">
                 <input type="color" name="colorText" style="--text:'Текст'" class="ui-color config-collector" value="#000000">
                 <input type="color" name="colorHref" style="--text:'Ссылки'" class="ui-color config-collector" value="#2b769f">
-                <input type="color" name="colorFavorite" style="--text:'Любимое'" class="ui-color config-collector" value="#2b769f">
             </div>
             <h3><i class="material-icons">find_in_page</i> Настройки поиска</h3>
             <div class="ui-grid">
@@ -95,26 +94,46 @@
                     <label for="nxe2LUhn">Отправлять данные на сервера</label>
                 </div>
             </div>
-            <h3><i class="material-icons">build</i> Приложение</h3>
-            <div class="ui-grid col-2">
-                <button onClick="App.checkUpdate()">Проверить обновления</button>
-                <button onClick="App.install(App.DEFAULT_MANIFEST,true)">Принудительно обновить</button>
-                <button onClick="localStorage.clear();location.reload()">Сбросить</button>
+            <h3><i class="material-icons">storage</i> Хранилище</h3>
+            <div class="ui-grid storage">
             </div>
             <h3><i class="material-icons">privacy_tip</i> Информация</h3>
             <div class="ui-grid ui-hrefs">
                 <a data-window="info-usage">Использование информации на клиенте</a>
                 <a data-window="info-processing">Использование информации на сервере</a>
+                <a data-window="tutorial">Инструкция по использованию</a>
                 <a data-window="about">О сайте</a>
+            </div>
+            <h3><i class="material-icons">build</i> Приложение</h3>
+            <div class="ui-grid col-2">
+                <button onClick="App.checkUpdate()">Проверить обновления</button>
+                <button onClick="App.install(App.DEFAULT_MANIFEST,true)">Принудительно обновить</button>
+                <button class="ui-disabled">Конвертация старых данных</button>
+                <button onClick="localStorage.clear();location.reload()">Сбросить</button>
             </div>
         </div>
         <div class="window history">
-            <h2><i class="material-icons">history</i> История просмотра</h2>
-            <hr>
+            <div class="ui-sticky-win">
+                <h2><i class="material-icons">history</i> История просмотра</h2>
+                <hr>
+            </div>
+            <div class="ui-grid results"></div>
         </div>
         <div class="window favorite">
             <h2><i class="material-icons">favorite</i> Любимое</h2>
             <hr>
+        </div>
+        <div class="window tutorial">
+            <h2><i class="material-icons">support</i> Инструкция по использованию</h2>
+            <hr>
+            <p>Некоторые функции сайта трудно узнать интуитивно (хоть мы и стремимся к упращению и стандартизации
+                интерфейса). Поэтому здесь перечислены нестандартные возможности взаимодействия с сайтом.</p>
+            <h4><i class="ui-key">Enter</i> Горячие клавиши</h4>
+            <div class="ui-grid">
+                <span><i class="ui-key">Esc</i> - закрывает окна/переходит на главную страницу</span>
+                <span><i class="ui-key">Alt</i><i class="ui-key">S</i> - открывает окно поиска</span>
+                <span><i class="ui-key">Alt</i><i class="ui-key">O</i> - открывает окно настроек</span>
+            </div>
         </div>
         <div class="window title-info">
             <div class="ui-grid"></div>
@@ -161,14 +180,18 @@
             <h3>Используемый материал</h3>
             <h4>Библиотеки</h4>
             <ul class="ui-hrefs">
-                <li><a href="https://github.com/jquery/jquery" target="_blank">jQuery</a></li>
-                <li><a href="https://github.com/verlok/vanilla-lazyload" target="_blank">LazyLoad</a></li>
-                <li><a href="https://github.com/jaywcjlove/hotkeys" target="_blank">Hotkeys</a></li>
-                <li><a href="https://github.com/Fleisar/kdk" target="_blank">shikimori (самописная)</a></li>
-                <li><a href="https://github.com/Fleisar/kdk" target="_blank">animetop (самописная)</a></li>
-                <li><a href="https://github.com/Fleisar/kdk" target="_blank">Bind addon (самописная)</a></li>
-                <li><a href="https://github.com/Fleisar/hover-menu" target="_blank">HoverMenu</a></li>
-                <li><a href="https://github.com/Fleisar" target="_blank">App core</a></li>
+                <li><a href="https://github.com/jquery/jquery" target="_blank">jQuery</a> - работа с интерфейсом</li>
+                <li><a href="https://github.com/verlok/vanilla-lazyload" target="_blank">LazyLoad</a> - оптипизация изображений</li>
+                <li><a href="https://github.com/jaywcjlove/hotkeys" target="_blank">Hotkeys</a> - горячие клавиши</li>
+                <li><a href="https://github.com/Fleisar/kdk" target="_blank">shikimori</a> - работа с Shikimori API</li>
+                <li><a href="https://github.com/Fleisar/kdk" target="_blank">animetop</a> - работа с AnimeTop API</li>
+                <li><a href="https://github.com/Fleisar/kdk" target="_blank">kodik</a> - работа с Kodik player API</li>
+                <li><a href="https://github.com/Fleisar/kdk" target="_blank">listStorage</a> - хранение списков</li>
+                <li><a href="https://github.com/Fleisar/kdk" target="_blank">configCollector</a> - контроллер настроек</li>
+                <li><a href="https://github.com/Fleisar/kdk" target="_blank">uri</a> - контроллер адресов</li>
+                <li><a href="https://github.com/Fleisar/kdk" target="_blank">Bind addon</a> - работа с событиями элементов</li>
+                <li><a href="https://github.com/Fleisar/hover-menu" target="_blank">HoverMenu</a> - контекстное меню</li>
+                <li><a href="https://github.com/Fleisar" target="_blank">App core</a> - конструктор приложений</li>
             </ul>
             <h4>API сервисы</h4>
             <ul class="ui-hrefs">

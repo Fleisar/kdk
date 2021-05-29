@@ -14,7 +14,10 @@ $(function(){
             {text:'<span class="icon" style="background-color:rgba(var(--colorFill),0.5)"><img alt="sk" src="https://shikimori.one/assets/layouts/l-top_menu-v2/glyph.svg" height="24"></span>Открыть в Shikimori',classes:['externalLink']}
         ],{classes:['icon-list','ui-hovermenu','ui-material-list']}),
         config: new configCollector(),
-        anilibria: new Anilibria()
+        anilibria: new Anilibria(),
+        kodik: new kodik('.page.player .player-kodik'),
+        sHistory: new listStorage('sHistory'),
+        sFavorite: new listStorage('sFavorite')
     }
     $(function(){
         binds.hover.bind(function(e){
@@ -117,6 +120,18 @@ $(function(){
         },
         noResults(text='Не удалось ничего найти'){
             return '<div class="ui-error"><div><span class="material-icons">announcement</span><h5>'+text+'</h5></div></div>'
+        },
+        progress(statistic,digits=2){
+            let data=statistic[1],progress=[],precent = 360/Object.keys(data).filter(k=>data[k].size!=='0B'?k:null).length,description=[]
+            Object.keys(data).filter(k=>data[k].size!=='0B'?k:null).forEach((k,i)=>{
+                let precents = Math.ceil(data[k].part*10**(digits+2))/10**digits
+                progress.push(`<div title="${k} - ${precents}%" style="--color:${data[k].color||precent*i}deg;--part:${data[k].part}"></div>`)
+                description.push(`<div style="--color:${data[k].color||precent*i}deg" title="${precents}%" class="ui-progress-part">${data[k].description||k} (${data[k].size})</div>`)
+            })
+            return `<span>Всего: ${statistic[0]}</span><div class="ui-progress">${progress.join('')}</div>${description.join('')}`
+        },
+        playerBar(data){
+            return `<a class="material-icons" data-window="title-info" data-add='${JSON.stringify(data)}' title="Информация">info</a><span>${data.russian||data.name}</span>`
         }
     }
     let config = (k,v)=>{
@@ -149,6 +164,10 @@ $(function(){
                 if(name===this.current&&this.container) return this.close()
                 return this.open(name,data)
             },'windows.bind')
+            $('.windows').click(e=>{
+                if(e.target.classList.contains('windows'))
+                    this.close()
+            })
         },
         open(name,data={}){
             if(this.current!==null) $('.window.'+this.current).removeClass('active')
@@ -166,7 +185,7 @@ $(function(){
         },
         array: {
             config: () => {
-
+                $('.window.config .storage').html(collections.progress(workers.storage._data()))
             },
             'title-info': title => {
                 console.log(title)
@@ -232,6 +251,12 @@ $(function(){
                     }
                 }
                 load(select.val())
+            },
+            history(){
+                let results = $('.window.history .results')
+                results.html('')
+                Object.values(binds.sHistory.get()).reverse().forEach(d=>results.append(collections.title(d.id,d.image.preview,d.russian||d.name,d.name,d)))
+                binds.lazyLoad.update()
             }
         }
     }
@@ -305,7 +330,9 @@ $(function(){
                     App.loaded()
                     this.update()
                 },
-                load(){},
+                load(){
+
+                },
                 update(){
                     if(this._title!==pages.levels[1].toString()+pages.levels[2].toString())
                         this.setPlayer(pages.levels[1],pages.levels[2])
@@ -313,8 +340,17 @@ $(function(){
                 },
                 setPlayer(name,id){
                     this._title = name.toString()+id.toString()
-                    shikimori.anime(id).then(r=>{
-                        this._data = r
+                    shikimori.animes().reset().ids([Number(id)]).then(r=>{
+                        this._data = r[0]
+                        App.title(`KDK - ${this._data.russian||this._data.name}`)
+                        $('.page.player .ui-bar').html(collections.playerBar(this._data))
+                        binds.sHistory.push({
+                            id: this._data.id,
+                            name: this._data.name,
+                            russian: this._data.russian,
+                            image: {preview:this._data.image.preview}
+                        })
+                        binds.aWindow.update()
                     })
                     $('.page.player .player-'+this._current).hide()
                     let players = {
@@ -469,9 +505,78 @@ $(function(){
             }
         },
         styles(){
-            document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
+            let f=()=>document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
+            window.addEventListener('resize',f)
+            f()
+        },
+        oldConvert: {
+            history(){
+                let list = localStorage.getItem('lsHistory')
+            }
+        },
+        storage: {
+            init(){
+                this.size._build()
+            },
+            size: {
+                _build(){
+                    Object.keys(this._old).forEach(k=>this[`old${k}`]=()=>this._Processor(this._old[k]))
+                    Object.keys(this._list).forEach(k=>this[k]=()=>this._Processor(this._list[k]))
+                },
+                _Processor(name){
+                    let list = localStorage.getItem(name)
+                    return list===null?0:new Blob([list]).size
+                },
+                _old: {
+                    Favorite: 'lsfavorite',
+                    Cache: 'cache',
+                    History: 'lshistory'
+                },
+                _list: {
+                    favorite: 'sFavorite',
+                    history: 'sHistory'
+                },
+                all(){
+                    let size = this.self()
+                    Object.values(this._old).forEach(v=>size+=this._Processor(v))
+                    Object.values(this.list).forEach(l=>size+=this._Processor(l))
+                    return size
+                },
+                self(){
+                    let file, size = 0
+                    App.info.sources.forEach(s=>{
+                        try{file=storage.get(s.name)}
+                        catch(e){
+                            console.groupCollapsed('Unable to load file')
+                            console.error(e)
+                            return console.groupEnd()
+                        }
+                        size += new Blob([file]).size
+                    })
+                    return size
+                }
+
+            },
+            _data(){
+                let data = {
+                    system: {size: this.size.self(),description: 'Файлы сайта'},
+                    oldcache: {size: this.size.oldCache(),description: 'Старые данные кэша'},
+                    oldhistory: {size: this.size.oldHistory(),description: 'Старая история просмотров'},
+                    oldfavorite: {size: this.size.oldFavorite(),description: 'Старый список любимого'},
+                    favorite: {size: this.size.favorite(),description: 'Список любимого'},
+                    history: {size: this.size.history(),description: 'История просмотров'}
+                }, all = Object.values(data).reduce((a,b)=>a+b.size,0)
+                return Object.keys(data).forEach(k=>(data[k].part=data[k].size/all,data[k].size=this._convert(data[k].size))),[this._convert(all),data]
+            },
+            _convert(bytes,digits=2){
+                let sizes = ["B","KB","MB"], step = 0
+                while (Math.floor(bytes/2**10)>=1&&step<sizes.length)
+                    (bytes = bytes/2**10),step++
+                return (Math.floor(bytes*10**digits)/10**digits)+(sizes[step]||sizes[step-1])
+            }
         }
     }
+    workers.storage.init()
     workers.styles()
     workers.hoverMenu()
     workers.hotkeys()
