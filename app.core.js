@@ -5,7 +5,7 @@
         install(manifest,reload=false){
             let startInstalling = (new Date()).getTime()
             this._downloadManifest(manifest||this.DEFAULT_MANIFEST,r=>{
-                if(!this._checkTypes([r.name,r.version,r.sources],['string','number','object'])) throw `Invalid manifest`
+                if(!this._checkTypes([r.name,r.update.release,r.sources],['string','number','object'])) throw `Invalid manifest`
                 this.uninstall()
                 App.info = r
                 let sources = 0
@@ -160,7 +160,7 @@
         },
         _checkTypes(variables, types){
             if(typeof variables !== 'object' || typeof types !== 'object' || variables.length !== types.length) throw `Invalid construction`
-            return variables.filter((o,i)=>{if(typeof o === types[i])return o}).length === variables.length
+            return variables.filter((o,i)=>{if(typeof o === types[i])return true}).length === variables.length
         }
     }
     App._init()
