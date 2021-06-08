@@ -1,9 +1,9 @@
 {
-  "dev_mode": 1,
+  "dev_mode": true,
   "short_name": "KDK",
   "name": "KDK Anime",
   "logo": "app/logo.svg",
-  "icon": ["app/logo.ico","icon"],
+  "icon": ["app/logo.png","image/png"],
   "application": {
     "name": "KDK",
     "manifest": "app/manifest.json"
@@ -48,7 +48,7 @@
       "type": "script"
     },
     {
-      "url": "app/bind.addon.js",
+      "url": "app/bind.addon.min.js",
       "type": "script"
     },
     {
@@ -60,44 +60,40 @@
       "type": "script"
     },
     {
-      "url": "app/hovermenu.js",
+      "url": "app/hovermenu.min.js",
       "type": "script"
     },
     {
-      "url": "app/listStorage.js",
+      "url": "app/listStorage.min.js",
       "type": "script"
     },
     {
-      "url": "app/configCollector.js",
+      "url": "app/configCollector.min.js",
       "type": "script"
     },
     {
-      "url": "app/uri.js",
+      "url": "app/uri.min.js",
       "type": "script"
     },
     {
-      "url": "app/kodik.js",
+      "url": "app/kodik.min.js",
       "type": "script"
     },
     {
-      "url": "app/shikimori.js",
+      "url": "app/shikimori.min.js",
       "type": "script"
     },
     {
-      "url": "app/animetop.js",
+      "url": "app/animetop.min.js",
       "type": "script"
     },
     {
-      "url": "app/anilibria.js",
+      "url": "app/anilibria.min.js",
       "type": "script"
     },
     {
-      "url": "app/main.js",
+      "url": "app/main.min.js",
       "type": "script"
     }
-  ],
-  "version": 1,
-  "expo": {
-    
-  }
+  ]
 }
