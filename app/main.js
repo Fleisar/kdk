@@ -10,6 +10,7 @@ $(function(){
             'Открыть',
             '<span class="material-icons icon">info</span>Информация',
             {text:'<span class="material-icons icon">favorite</span>Любимое',action:'stay',classes:['ui-disabled']},
+            {text:'<span class="material-icons icon">gps_not_fixed</span>Отслеживать',action:'stay',classes:['ui-disabled']},
             '<span class="material-icons icon">content_copy</span>Скопировать название',
             {text:'<span class="icon" style="background-color:rgba(var(--colorFill),0.5)"><img alt="sk" src="https://shikimori.one/assets/layouts/l-top_menu-v2/glyph.svg" height="24"></span>Открыть в Shikimori',classes:['externalLink']}
         ],{classes:['icon-list','ui-hovermenu','ui-material-list']}),
@@ -27,6 +28,11 @@ $(function(){
             })
         },'jq.custom')
         pages.init()
+        $('body').contextmenu(e=>{
+            if(windows.current!==null)windows.close()
+            else pages.set('general')
+            e.preventDefault()
+        })
         binds.aPage.bind(function(){
             pages.set($(this).attr('data-page'))
         },'jq.custom')
@@ -49,7 +55,7 @@ $(function(){
             return `
                 <a data-page="player" href="#player/shikimori/${id}" title="${original_name}">
                     <div class="ui-title" data-add='${JSON.stringify(data)}'>
-                        <img alt="${original_name}" class="lazy" data-src="//shikimori.one${poster}">
+                        <img alt="${original_name}" class="lazy" src="${data.image.original!==undefined?'//shikimori.one'+data.image.preview:''}" data-src="//shikimori.one${binds.config.config.highPreview?data.image.original||poster:poster}">
                         <div></div>
                     </div>
                 </a>
@@ -66,7 +72,7 @@ $(function(){
                 <a data-page="player" href="#player/shikimori/${id}" title="${original_name}">
                     <div>
                         <div class="ui-title" data-add='${JSON.stringify(data)}'>
-                            <img alt="${original_name}" class="lazy" data-src="//shikimori.one${poster}">
+                            <img alt="${original_name}" class="lazy" src="//shikimori.one${data.image.preview}" data-src="//shikimori.one${binds.config.config.highPreview?data.image.original:poster}">
                         </div>
                         <span>${name||original_name}</span>
                     </div>
@@ -75,7 +81,7 @@ $(function(){
         },
         titleInfo(data){
             return `
-                <div class="ui-title" data-add='${JSON.stringify(data)}' style="margin:auto">
+                <div class="ui-title inactive" data-add='${JSON.stringify(data)}' style="margin:auto">
                     <img alt="${data.name}" src="//shikimori.one${data.image.original}">
                 </div>
                 <h2 style="margin:auto" title="${data.name}">${data.russian||data.name} [${data.kind}]</h2>
@@ -108,10 +114,22 @@ $(function(){
                         </tr>
                     </tbody>
                 </table>
+                <hr>
                 <ui class="icon-list ui-material-list">
                     <li onclick="url.set('#player/shikimori/${data.id}',{})">Открыть</li>
                     <li class="ui-disabled"><span class="material-icons icon">favorite</span>Любимое</li>
+                    <li class="ui-disabled"><span class="material-icons icon">gps_not_fixed</span>Отслеживать</li>
                     <li onclick="window.open('//shikimori.one${data.url}')"><span class="icon" style="background-color:rgba(var(--colorFill),0.5)"><img alt="sk" src="https://shikimori.one/assets/layouts/l-top_menu-v2/glyph.svg" height="24"></span>Открыть в Shikimori</li>
+                </ui>
+                <hr>
+                <h3>Хронология</h3>
+                <ui class="ui-material-list timeline">
+                    ${collections.loadingResults()}
+                </ui>
+                <hr>
+                <h3>Ссылки</h3>
+                <ui class="ui-material-list icon-list links">
+                    ${collections.loadingResults()}
                 </ui>
             `
         },
@@ -132,6 +150,9 @@ $(function(){
         },
         playerBar(data){
             return `<a class="material-icons" data-window="title-info" data-add='${JSON.stringify(data)}' title="Информация">info</a><span>${data.russian||data.name}</span>`
+        },
+        materialItem(text,data){
+            return `${data.window||data.page||data.href?`<a ${data.data||data.href?` href="${data.data||data.href}"`:''} ${data.href?'target="_blank"':''} ${data.page?`data-page='${data.page}'`:''} ${data.window?`data-window='${data.window}'${data.data?` data-add="${data.data}"`:''}`:''}>`:''}<li ${data.active?'class="active"':''}>${text}</li>${data.window||data.page||data.href?`</a>`:''}`
         }
     }
     let config = (k,v)=>{
@@ -147,9 +168,8 @@ $(function(){
             case 'colorFill': return body.css('--colorFill',toRGB(v).join(', '))
             case 'colorHref': return body.css('--colorHref',toRGB(v).join(', '))
             case 'highEffects': return body.attr('highEffects',v.toString())
-            case 'playerMode':
-                $('div.page.player, div.window.config div.player-preview').attr('playerMode', v)
-                break;
+            case 'playerMode': return $('div.page.player, div.window.config div.player-preview').attr('playerMode', v)
+            case 'showTracking': return $('header [data-window=tracking]').attr('display',v.toString())
         }
     }
     binds.config.change(config)
@@ -160,7 +180,6 @@ $(function(){
             binds.aWindow.bind(e=>{
                 let data = JSON.parse(e.delegateTarget.dataset.add||"{}")
                     ,name = e.delegateTarget.dataset.window
-
                 if(name===this.current&&this.container) return this.close()
                 return this.open(name,data)
             },'windows.bind')
@@ -188,8 +207,21 @@ $(function(){
                 $('.window.config .storage').html(collections.progress(workers.storage._data()))
             },
             'title-info': title => {
-                console.log(title)
                 $('.windows .window.title-info .ui-grid').html(collections.titleInfo(title))
+                let timeline = $('.window.title-info .ui-material-list.timeline'),links=$('.window.title-info .ui-material-list.links')
+                shikimori.anime(title.id).franchise().then(r=>{
+                    timeline.html('')
+                    r.nodes.forEach(n=>{
+                        timeline.append(collections.materialItem(n.name,{page:'player',data:`#player/shikimori/${n.id}`,active:n.id===title.id}))
+                    })
+                    binds.aPage.update()
+                })
+                shikimori.anime(title.id).external_links().then(r=>{
+                    links.html('')
+                    r.forEach(l=>{
+                        links.append(collections.materialItem(`<span class="icon"><img src="https://shikimori.one/assets/blocks/b-external_links/${l.kind}.png" height="100%"></span>${workers.shikimori.linkTitle(l.kind)||l.kind}`,{href:l.url}))
+                    })
+                })
             },
             search: data => {
                 if(data.text) {
@@ -253,9 +285,10 @@ $(function(){
                 load(select.val())
             },
             history(){
-                let results = $('.window.history .results')
+                let results = $('.window.history .results'),hs=workers.metric.history()
                 results.html('')
-                Object.values(binds.sHistory.get()).reverse().forEach(d=>results.append(collections.title(d.id,d.image.preview,d.russian||d.name,d.name,d)))
+                if(hs===false) return results.html(collections.noResults('Сбор данных отключён'))
+                Object.values(hs.get()).reverse().forEach(d=>results.append(collections.title(d.id,d.image.preview,d.russian||d.name,d.name,d)))
                 binds.lazyLoad.update()
             }
         }
@@ -344,11 +377,12 @@ $(function(){
                         this._data = r[0]
                         App.title(`KDK - ${this._data.russian||this._data.name}`)
                         $('.page.player .ui-bar').html(collections.playerBar(this._data))
-                        binds.sHistory.push({
+                        let hs=workers.metric.history()
+                        hs&&hs.push({
                             id: this._data.id,
                             name: this._data.name,
                             russian: this._data.russian,
-                            image: {preview:this._data.image.preview}
+                            image: {preview:this._data.image.preview,original:this._data.image.original}
                         })
                         binds.aWindow.update()
                     })
@@ -432,24 +466,25 @@ $(function(){
             })
         },
         metric: {
-            state: false,
+            state:()=>binds.config.config.collectInformation,
             init(){
-                this.state = Boolean(binds.config._value('collectInformation'))
+
+            },
+            history(){
+                return workers.metric.state()?binds.sHistory:false
             }
         },
         hoverMenu(){
             binds.titleHover.on('click',n=>{
-                console.log(n,tile)
                 switch (Number(n)) {
                     case 0: return url.set('#player/shikimori/'+tile.id,{})
                     case 1: return windows.open('title-info',tile)
                     case 2: return workers.favorite.toggle(tile)
-                    case 3: return navigator.clipboard.writeText(tile.name)
-                    case 4: return window.open('https://shikimori.one'+tile.url)
+                    case 4: return navigator.clipboard.writeText(tile.name)
+                    case 5: return window.open('https://shikimori.one'+tile.url)
                 }
             }).on('open',e=>{
                 tile = JSON.parse(e.delegateTarget.dataset.add||"{}")
-                console.log(tile)
             })
         },
         schedule: {
@@ -505,8 +540,13 @@ $(function(){
             }
         },
         styles(){
-            let f=()=>document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
+            let f=()=>{
+                let hd=document.querySelector('header'),cs=document.querySelector('#--headerCeilSize').offsetHeight
+                document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`)
+                hd.children[0].style.height=((document.querySelectorAll('header>nav>a[display=true]').length+4)*cs>=hd.offsetHeight)?'fit-content':'100%'
+            }
             window.addEventListener('resize',f)
+            document.addEventListener("DOMContentLoaded",f)
             f()
         },
         oldConvert: {
@@ -573,6 +613,38 @@ $(function(){
                 while (Math.floor(bytes/2**10)>=1&&step<sizes.length)
                     (bytes = bytes/2**10),step++
                 return (Math.floor(bytes*10**digits)/10**digits)+(sizes[step]||sizes[step-1])
+            }
+        },
+        shikimori: {
+            linkTitle(kind){
+                switch(kind){
+                    case'wikipedia':return'Wikipedia'
+                    case'anime_news_network':return'Anime News Network'
+                    case'myanimelist':return'MyAnimeList'
+                    case'anime_db':return'AniDB'
+                    case'world_art':return'World Art'
+                    case'twitter':return'Twitter'
+                    case'official_site':return'Официальный сайт'
+                    case'kage_project':return'Kage Project'
+                    case'kinopoisk':return'Кинопоиск'
+                    case'ruranobe':return'РуРанобэ'
+                    case'readmanga':return'ReadManga'
+                    case'novelupdates':return'NovelUpdates'
+                    case'mangaupdates':return'MangaUpdates'
+                    case'mangafox':return'MangaFox'
+                    case'mangachan':return'Манга-тян'
+                    case'mangahub':return'Mangahub'
+                    case'smotret_anime':return'Смотреть аниме'
+                    case'youtube_channel':return'YouTube'
+                    case'novel_tl':return'Novel.tl'
+                    case'mangalib':return'MangaLib'
+                    case'ranobelib':return'RanobeLib'
+                    case'remanga':return'ReManga'
+                    case'mangadex':return'MangaDex'
+                    case'more_tv':return'more.tv'
+                    case'baike_baidu_wiki':return'Baike Baidu Wiki'
+                    case'namu_wiki':return'Namu Wiki'
+                }
             }
         }
     }
