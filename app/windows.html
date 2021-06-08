@@ -29,7 +29,7 @@
             <h2><i class="material-icons">settings</i> Настройки</h2>
             <hr>
             <h3><i class="material-icons">extension</i> Настройки интерфейса</h3>
-            <div class="ui-grid results">
+            <div class="ui-grid">
                 <div>
                     <input id="8YMhUhte" type="checkbox" name="disableAnimations" class="ui-switch config-collector">
                     <label for="8YMhUhte">Отключить все анимации</label>
@@ -42,6 +42,9 @@
                     <input id="rJQ4NcsN" type="checkbox" name="showTime" class="ui-switch config-collector">
                     <label for="rJQ4NcsN">Показыввать локальное время на сайте</label>
                 </div>
+            </div>
+            <h3><i class="material-icons">menu</i> Настройки меню</h3>
+            <div class="ui-grid">
                 <div>
                     <input id="Gnxy6Rh2" type="checkbox" name="showReleases" class="ui-switch config-collector">
                     <label for="Gnxy6Rh2">Показывать расписание релизов</label>
@@ -53,6 +56,17 @@
                 <div class="ui-disabled">
                     <input id="EQF5jjf6" type="checkbox" name="showFavorite" class="ui-switch config-collector">
                     <label for="EQF5jjf6">Показывать список любимого</label>
+                </div>
+                <div class="ui-disabled">
+                    <input id="EQF5jhf6" type="checkbox" name="showTracking" class="ui-switch config-collector">
+                    <label for="EQF5jhf6">Показывать список отслеживания</label>
+                </div>
+            </div>
+            <h3><i class="material-icons">play_arrow</i> Плеер</h3>
+            <div class="ui-grid">
+                <div class="ui-disabled">
+                    <input id="FQF5jhf6" type="checkbox" name="disableAds" class="ui-switch config-collector">
+                    <label for="FQF5jhf6">Отключить рекламу</label>
                 </div>
                 <div>
                     <span>Внешний вид плеера</span>
@@ -75,21 +89,26 @@
                 <input type="color" name="colorBG" style="--text:'Фон'" class="ui-color config-collector" value="#f0f0f0">
                 <input type="color" name="colorText" style="--text:'Текст'" class="ui-color config-collector" value="#000000">
                 <input type="color" name="colorHref" style="--text:'Ссылки'" class="ui-color config-collector" value="#2b769f">
+                <input type="color" name="colorAttention" style="--text:'Внимание'" class="ui-color config-collector ui-disabled" value="#cc3838">
             </div>
             <h3><i class="material-icons">find_in_page</i> Настройки поиска</h3>
             <div class="ui-grid">
                 <div>
-                    <input id="mSRrDrY5" type="checkbox" name="realtimeSearch" class="ui-switch config-collector">
-                    <label for="mSRrDrY5">Поиск в реальном времени</label>
+                    <input id="mSRrDgY5" type="checkbox" name="realtimeSearch" class="ui-switch config-collector">
+                    <label for="mSRrDgY5">Поиск в реальном времени</label>
+                </div>
+                <div>
+                    <input id="mSRrDrY5" type="checkbox" name="highPreview" class="ui-switch config-collector">
+                    <label for="mSRrDrY5">Высокое качество изображения</label>
                 </div>
             </div>
             <h3><i class="material-icons">track_changes</i> Сбор данных</h3>
-            <div class="ui-grid ui-disabled">
+            <div class="ui-grid">
                 <div>
                     <input id="pXQPrP7b" type="checkbox" name="collectInformation" class="ui-switch config-collector">
                     <label for="pXQPrP7b">Собирать информацию об использовании</label>
                 </div>
-                <div>
+                <div class="ui-disabled">
                     <input id="nxe2LUhn" type="checkbox" name="sendInformation" class="ui-switch config-collector">
                     <label for="nxe2LUhn">Отправлять данные на сервера</label>
                 </div>
@@ -119,6 +138,13 @@
             </div>
             <div class="ui-grid results"></div>
         </div>
+        <div class="window tracking">
+            <div class="ui-sticky-win">
+                <h2><i class="material-icons">track_changes</i> Отслеживание тайтлов</h2>
+                <hr>
+            </div>
+            <div class="ui-grid results"></div>
+        </div>
         <div class="window favorite">
             <h2><i class="material-icons">favorite</i> Любимое</h2>
             <hr>
@@ -130,7 +156,7 @@
                 интерфейса). Поэтому здесь перечислены нестандартные возможности взаимодействия с сайтом.</p>
             <h4><i class="ui-key">Enter</i> Горячие клавиши</h4>
             <div class="ui-grid">
-                <span><i class="ui-key">Esc</i> - закрывает окна/переходит на главную страницу</span>
+                <span><i class="ui-key">Esc</i> или <i class="ui-key">ЛКМ</i> - закрывает окна/переходит на главную страницу</span>
                 <span><i class="ui-key">Alt</i><i class="ui-key">S</i> - открывает окно поиска</span>
                 <span><i class="ui-key">Alt</i><i class="ui-key">O</i> - открывает окно настроек</span>
             </div>
