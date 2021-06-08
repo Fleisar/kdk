@@ -1,0 +1,39 @@
+html {background-color: #000}
+body {
+  width: 500px;
+  margin: auto;
+  border: 1px solid;
+  box-sizing: border-box;
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+th>.title{position: sticky;top:0;}
+th,td {
+  box-shadow: 0 0 1px 0 #000;
+  background-color: #fff;
+  vertical-align:top;
+}
+main {
+  max-height: 500px;
+  overflow: hidden;
+  overflow-y: auto;
+  flex: 3;
+  position: relative;
+  table{width: 100%}
+}
+#log {
+  display: flex;
+  flex-direction: column;
+  height: 300px;
+  overflow: hidden;
+  overflow-y: auto;
+  .error {background-color:#faa}
+  .warn {background-color:#ffa}
+  flex: 1;
+}
+footer {
+  background-color: #fff;
+  filter: invert(1);
+}
