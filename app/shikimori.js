@@ -135,7 +135,7 @@
             topics(){this._request='/topics';return this},
             then(callback,onError=callback){
                 if(typeof callback !== 'function')throw `Callback must be a function`
-                fetch(`${shikimori.POOL_REQUEST}animes/${this.id}${this.request}`).then((r,e)=>{
+                fetch(`${shikimori.POOL_REQUEST}animes/${this.id}${this._request}`).then((r,e)=>{
                     if(e)return onError(r,e)
                     if(r.ok) r.json().then(json=>callback(json))
                 })

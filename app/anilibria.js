@@ -32,7 +32,7 @@
         PROXY: 'https://pur.fle.su/ref/post.php?url=',
         _request(url,options){
             let method = (options.method||'get').toUpperCase()
-            let query = this._httpBuildQuery(options.data||{})
+                ,query = this._httpBuildQuery(options.data||{})
             return new Promise((resolve,reject)=>{
                 let xhr = new XMLHttpRequest()
                 xhr.onreadystatechange = () => {

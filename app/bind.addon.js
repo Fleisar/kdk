@@ -26,8 +26,9 @@ Bind.prototype = {
         return this
     },
     update(){
-        $(this.selector).unbind(this.action).on(this.action,e=>{
-            this.handlers&&Object.values(this.handlers).forEach(f=>f.function(e))
+        let handlers = this.handlers
+        $(this.selector).unbind(this.action).on(this.action,function(e){
+            handlers&&Object.values(handlers).forEach(f=>f.function.call(this,e))
         })
         return this
     },
