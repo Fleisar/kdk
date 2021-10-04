@@ -27,16 +27,17 @@
             }
         }
         window.addEventListener('message',(d,a=null)=>{
-            if(!d.data.key.startsWith('kodik_player_'))return false
+            if(d.data.key===undefined||!d.data.key.startsWith('kodik_player_'))return false
             if(Object.keys(this._a.on).indexOf(a=d.data.key.substr(13))===-1){
                 console.groupCollapsed('Undefined action')
                 console.warn(d.data)
                 console.groupEnd()
             }
+
             this._a.on[a].forEach(f=>f(d.data))
         })
         if((this.SELF=document.querySelector(selector))===null)throw'Kodik player not found'
-        Object.keys(this._a).forEach(p=>Object.keys(p).forEach(a=>this[p]=h=>this[p](a,h)))
+        Object.keys(this._a).forEach(p=>Object.keys(this._a[p]).forEach(a=>this[p+'_'+a]=h=>this[p](a,h)))
     }
     window.kodik.prototype = {
         on(action,handler){

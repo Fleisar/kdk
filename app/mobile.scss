@@ -41,3 +41,7 @@
   width: 100%;
   font-size: larger;
 }
+
+*::-webkit-scrollbar {
+  width: 0;
+}

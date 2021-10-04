@@ -76,7 +76,15 @@
       "type": "script"
     },
     {
-      "url": "app/kodik.min.js",
+      "url": "app/animevost.js",
+      "type": "script"
+    },
+    {
+      "url": "app/kodik.js",
+      "type": "script"
+    },
+    {
+      "url": "app/kodik.backend.js",
       "type": "script"
     },
     {
@@ -92,7 +100,7 @@
       "type": "script"
     },
     {
-      "url": "app/main.min.js",
+      "url": "app/main.js",
       "type": "script"
     }
   ]

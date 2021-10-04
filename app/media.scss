@@ -15,10 +15,11 @@
 @media (min-width: 720px) {
   body[highEffects=true] {
     header {
-      transform: perspective(300px) rotateY(4deg) scale(0.9);
+      transform: translateX(calc(var(--headerWidth) * -1 + 5px));
       opacity: 0.5;
-      transition: var(--animationUI);
+      transition: var(--animationUI) calc(var(--animationUI) * 5);
       &:hover {
+        transition: var(--animationUI);
         transform: perspective(300px) rotateY(0) scale(0.95) translateX(10px);
         opacity: 1;
       }
@@ -31,10 +32,22 @@
       & > .main-window {
         left: var(--pageLeft);
         transform: perspective(300px) rotateY(4deg) scale(0.9) translateY(5px);
-        animation: 5s var(--animationUI) windows-breathing infinite;
+        animation: 3s windows-breathing infinite ease-in-out alternate-reverse;
+      }
+      & > .context-window > .context {
+        animation: 2.5s context-breathing infinite ease-in-out alternate-reverse;
       }
     }
   }
+}
+@media (max-width: 1700px) {
+  body {--generalRowCount: 6}
+}
+@media (max-width: 1450px) {
+  body {--generalRowCount: 5}
+}
+@media (max-width: 1250px) {
+  body {--generalRowCount: 4}
 }
 @media (max-width: 1000px) {
   body {--generalRowCount: 3}

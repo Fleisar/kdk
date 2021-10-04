@@ -68,6 +68,22 @@
                     <input id="FQF5jhf6" type="checkbox" name="disableAds" class="ui-switch config-collector">
                     <label for="FQF5jhf6">Отключить рекламу</label>
                 </div>
+                <div class="ui-disabled">
+                    <input id="HQF5jhf6" type="checkbox" name="pauseOnBlur" class="ui-switch config-collector">
+                    <label for="HQF5jhf6">Ставить на паузе при потери фокуса приложения</label>
+                </div>
+                <div class="ui-disabled">
+                    <input id="HQF5thf6" type="checkbox" name="pauseOnMin" class="ui-switch config-collector">
+                    <label for="HQF5thf6">Ставить на паузе при сворачивании проигрывателя</label>
+                </div>
+                <div class="ui-disabled">
+                    <input id="HQH5thf6" type="checkbox" name="showSkip" class="ui-switch config-collector">
+                    <label for="HQH5thf6">Показывать кнопку пропуска времени</label>
+                </div>
+                <div class="ui-disabled">
+                    <span>Время пропуска в секундах</span>
+                    <input class="ui-input config-collector" type="number" min="1" max="300" step="1" value="90" name="skipDuration">
+                </div>
                 <div>
                     <span>Внешний вид плеера</span>
                     <div class="ui-select">
@@ -89,7 +105,7 @@
                 <input type="color" name="colorBG" style="--text:'Фон'" class="ui-color config-collector" value="#f0f0f0">
                 <input type="color" name="colorText" style="--text:'Текст'" class="ui-color config-collector" value="#000000">
                 <input type="color" name="colorHref" style="--text:'Ссылки'" class="ui-color config-collector" value="#2b769f">
-                <input type="color" name="colorAttention" style="--text:'Внимание'" class="ui-color config-collector ui-disabled" value="#cc3838">
+                <input type="color" name="colorAttention" style="--text:'Внимание'" class="ui-color config-collector" value="#cc3838">
             </div>
             <h3><i class="material-icons">find_in_page</i> Настройки поиска</h3>
             <div class="ui-grid">
@@ -102,8 +118,12 @@
                     <label for="mSRrDrY5">Высокое качество изображения</label>
                 </div>
             </div>
-            <h3><i class="material-icons">track_changes</i> Сбор данных</h3>
+            <h3><i class="material-icons">track_changes</i> Управнение данными</h3>
             <div class="ui-grid">
+                <div>
+                    <input id="jXQPrP7b" type="checkbox" name="cacheLess" class="ui-switch config-collector">
+                    <label for="jXQPrP7b">Сохранять меньше информации в списках</label>
+                </div>
                 <div>
                     <input id="pXQPrP7b" type="checkbox" name="collectInformation" class="ui-switch config-collector">
                     <label for="pXQPrP7b">Собирать информацию об использовании</label>
@@ -129,6 +149,9 @@
                 <button onClick="App.install(App.DEFAULT_MANIFEST,true)">Принудительно обновить</button>
                 <button class="ui-disabled">Конвертация старых данных</button>
                 <button onClick="localStorage.clear();location.reload()">Сбросить</button>
+            </div>
+            <div class="ui-grid">
+                <span class="version ui-min-font"></span>
             </div>
         </div>
         <div class="window history">
@@ -212,6 +235,7 @@
                 <li><a href="https://github.com/Fleisar/kdk" target="_blank">shikimori</a> - работа с Shikimori API</li>
                 <li><a href="https://github.com/Fleisar/kdk" target="_blank">animetop</a> - работа с AnimeTop API</li>
                 <li><a href="https://github.com/Fleisar/kdk" target="_blank">kodik</a> - работа с Kodik player API</li>
+                <li><a href="https://github.com/Fleisar/kdk" target="_blank">kodik backend</a> - работа с API Kodik</li>
                 <li><a href="https://github.com/Fleisar/kdk" target="_blank">listStorage</a> - хранение списков</li>
                 <li><a href="https://github.com/Fleisar/kdk" target="_blank">configCollector</a> - контроллер настроек</li>
                 <li><a href="https://github.com/Fleisar/kdk" target="_blank">uri</a> - контроллер адресов</li>
@@ -232,5 +256,13 @@
                 <a href="https://github.com/Fleisar/kdk/issues" target="_blank">GitHub</a> и
                 <a href="https://discord.gg/XK6BKFJ" target="_blank">Discord-сервере</a>.</p>
         </div>
+        <div class="window console">
+            <div class="result ui-grid">
+
+            </div>
+        </div>
+    </div>
+    <div class="context-window">
+        <div class="context"></div>
     </div>
 </div>
