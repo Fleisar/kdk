@@ -182,7 +182,7 @@ $(function(){
                             this.close()
                     })
                 },
-                open(content){
+                open(){
                     !this.container&&$('.windows').addClass('use')
                 },
                 close(closeWindow=true){
@@ -309,15 +309,21 @@ $(function(){
                     default: return this.set('general')
                 }
             },
-            set(name){
+            set(name, ...args){
                 if(Object.keys(this.array).indexOf(name)===-1) throw 'This page doesn\'t exist'
                 windows.close()
                 workers.console.log(`Page open - ${name}`)
                 $('.page.'+this._current).css('display','none')
                 'unload'in this.array[this._current]&&this.array[this._current].unload(...Array(...arguments).splice(1))
                 this._current = name
-                if(this._working.indexOf(name)!==-1)'update'in this.array[name]&&this.array[name].update(...Array(...arguments).splice(1))
-                else this._working.push(name),this.array[name].main(...Array(...arguments).splice(1))
+                if (this._working.includes(name)) {
+                    if ('update' in this.array[name]) {
+                        this.array[name].update(...args);
+                    }
+                } else {
+                    this._working.push(name);
+                    this.array[name].main(...args);
+                }
                 $('.page.'+name).css('display','inline-block')
             },
             array: {
@@ -641,21 +647,31 @@ $(function(){
 
                 },
                 _data(){
-                    let data = {
+                    const data = {
                         system: {size: this.size.self(),description: 'Файлы сайта'},
                         oldcache: {size: this.size.oldCache(),description: 'Старые данные кэша'},
                         oldhistory: {size: this.size.oldHistory(),description: 'Старая история просмотров'},
                         oldfavorite: {size: this.size.oldFavorite(),description: 'Старый список любимого'},
                         favorite: {size: this.size.favorite(),description: 'Список любимого'},
                         history: {size: this.size.history(),description: 'История просмотров'}
-                    }, all = Object.values(data).reduce((a,b)=>a+b.size,0)
-                    return Object.keys(data).forEach(k=>(data[k].part=data[k].size/all,data[k].size=this._convert(data[k].size))),[this._convert(all),data]
+                    };
+                    const all = Object.values(data).reduce((a, b) => a + b.size ,0);
+                    Object.values(data).forEach((value) => {
+                        value.part = value.size / all;
+                        value.size = this._convert(value.size);
+                    })
+                    return [this._convert(all), data];
                 },
-                _convert(bytes,digits=2){
-                    let sizes = ["B","KB","MB"], step = 0
-                    while (Math.floor(bytes/2**10)>=1&&step<sizes.length)
-                        (bytes = bytes/2**10),step++
-                    return (Math.floor(bytes*10**digits)/10**digits)+(sizes[step]||sizes[step-1])
+                _convert(bytes, digits = 2){
+                    const sizes = [
+                        [2 ** 0, 'B'],
+                        [2 ** 10,'KB'],
+                        [2 ** 20, 'MB'],
+                        [2 ** 30, 'GB'],
+                    ];
+                    const diffs = sizes.map(([size]) => Math.abs(sizes - bytes));
+                    const closureIndex = sizes[Math.min(...diffs)];
+                    return `${Math.ceil(bytes / sizes[closureIndex][0] * 10 ** digits) / 10 ** digits}${sizes[closureIndex][1]}`;
                 }
             },
             shikimori: {
