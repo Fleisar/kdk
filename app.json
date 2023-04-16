@@ -48,31 +48,31 @@
       "type": "script"
     },
     {
-      "url": "app/bind.addon.min.js",
+      "url": "app/bind.addon.js",
       "type": "script"
     },
     {
-      "url": "https://cdn.jsdelivr.net/npm/hotkeys-js@3.7.3/dist/hotkeys.min.js",
+      "url": "https://cdn.jsdelivr.net/npm/hotkeys-js@3.7.3/dist/hotkeys.js",
       "type": "script"
     },
     {
-      "url": "https://cdn.jsdelivr.net/npm/vanilla-lazyload@17.3.0/dist/lazyload.min.js",
+      "url": "https://cdn.jsdelivr.net/npm/vanilla-lazyload@17.3.0/dist/lazyload.js",
       "type": "script"
     },
     {
-      "url": "app/hovermenu.min.js",
+      "url": "app/hovermenu.js",
       "type": "script"
     },
     {
-      "url": "app/listStorage.min.js",
+      "url": "app/listStorage.js",
       "type": "script"
     },
     {
-      "url": "app/configCollector.min.js",
+      "url": "app/configCollector.js",
       "type": "script"
     },
     {
-      "url": "app/uri.min.js",
+      "url": "app/uri.js",
       "type": "script"
     },
     {
@@ -88,15 +88,15 @@
       "type": "script"
     },
     {
-      "url": "app/shikimori.min.js",
+      "url": "app/shikimori.js",
       "type": "script"
     },
     {
-      "url": "app/animetop.min.js",
+      "url": "app/animetop.js",
       "type": "script"
     },
     {
-      "url": "app/anilibria.min.js",
+      "url": "app/anilibria.js",
       "type": "script"
     },
     {
