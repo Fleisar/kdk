@@ -10,9 +10,9 @@
   },
   "load_type": "self",
   "update": {
-    "release": 0,
-    "type": "dev",
-    "version": "3.01-beta",
+    "release": 100,
+    "type": "release",
+    "version": "3.1 stable",
     "description": ""
   },
   "update_policy": {
