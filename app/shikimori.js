@@ -1,7 +1,9 @@
 /* API docs (official): https://shikimori.one/api/doc/1.0 */
 (function(){
+    const SHIKIMORI_ORIGIN = '//shikimori.me';
     window.shikimori = {
-        POOL_REQUEST: 'https://shikimori.one/api/',
+        origin: SHIKIMORI_ORIGIN,
+        api: `${SHIKIMORI_ORIGIN}/api`,
         anime(id){
             return new this._anime(id)
         },
@@ -111,7 +113,7 @@
                     if(args[k]==='')return ''
                     return `${k}=${args[k]}`
                 }).join('&')
-                fetch(`${shikimori.POOL_REQUEST}animes?${http_query}`).then((r,e)=>{
+                fetch(`${shikimori.api}/animes?${http_query}`).then((r,e)=>{
                     if(e)return onError(r,e)
                     if(r.ok) r.json().then(json=>callback(json))
                 })
@@ -135,7 +137,7 @@
             topics(){this._request='/topics';return this},
             then(callback,onError=callback){
                 if(typeof callback !== 'function')throw `Callback must be a function`
-                fetch(`${shikimori.POOL_REQUEST}animes/${this.id}${this._request}`).then((r,e)=>{
+                fetch(`${shikimori.api}/animes/${this.id}${this._request}`).then((r,e)=>{
                     if(e)return onError(r,e)
                     if(r.ok) r.json().then(json=>callback(json))
                 })

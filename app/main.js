@@ -12,7 +12,7 @@ $(function(){
                 {text:'<span class="material-icons icon">favorite</span>Любимое',action:'stay',classes:['ui-disabled']},
                 {text:'<span class="material-icons icon">gps_not_fixed</span>Отслеживать',action:'stay',classes:['ui-disabled']},
                 '<span class="material-icons icon">content_copy</span>Скопировать название',
-                {text:'<span class="icon" style="background-color:rgba(var(--colorFill),0.5)"><img alt="sk" src="https://shikimori.one/assets/layouts/l-top_menu-v2/glyph.svg" height="24"></span>Открыть в Shikimori',classes:['externalLink']}
+                {text:`<span class="icon" style="background-color:rgba(var(--colorFill),0.5)"><img alt="sk" src="${shikimori.origin}/assets/layouts/l-top_menu-v2/glyph.svg" height="24"></span>Открыть в Shikimori`,classes:['externalLink']}
             ],{classes:['icon-list','ui-hovermenu','ui-material-list']}),
             config: new configCollector(),
             anilibria: new Anilibria(),
@@ -36,7 +36,7 @@ $(function(){
             titleBase(data,bottom,options={}){
                 return `
                     <div class="ui-title${options.classes?` ${options.classes.join(' ')}`:''}" data-add='${JSON.stringify(data)}' ${options.style?`style="${Object.keys(options.style).map(k=>k+':'+options.style[k]).join(';')}"`:''}>
-                        <div class="lazy preview" data-bg="//shikimori.one${binds.config.config.highPreview?data.image.original||data.image.preview:data.image.preview}"></div>
+                        <div class="lazy preview" data-bg="${shikimori.origin}${binds.config.config.highPreview?data.image.original||data.image.preview:data.image.preview}"></div>
                         <div>${bottom||""}</div>
                     </div>
                 `
@@ -82,7 +82,7 @@ $(function(){
                         <li onclick="url.set('#player/shikimori/${data.id}',{})">Открыть</li>
                         <li class="ui-disabled"><span class="material-icons icon">favorite</span>Любимое</li>
                         <li class="ui-disabled"><span class="material-icons icon">gps_not_fixed</span>Отслеживать</li>
-                        <li onclick="window.open('//shikimori.one${data.url}')"><span class="icon" style="background-color:rgba(var(--colorFill),0.5)"><img alt="sk" src="https://shikimori.one/assets/layouts/l-top_menu-v2/glyph.svg" height="24"></span>Открыть в Shikimori</li>
+                        <li onclick="window.open('${shikimori.origin}${data.url}')"><span class="icon" style="background-color:rgba(var(--colorFill),0.5)"><img alt="sk" src="${shikimori.origin}/assets/layouts/l-top_menu-v2/glyph.svg" height="24"></span>Открыть в Shikimori</li>
                     </ui>
                     <hr>
                     <h3>Хронология</h3>
@@ -210,7 +210,7 @@ $(function(){
                         links.html('')
                         r.forEach(l=>{
                             let kind = workers.shikimori.linkTitle(l.kind)
-                            links.append(collections.materialItem(`<span class="icon"><img src="https://shikimori.one/assets/blocks/b-external_links/${kind?l.kind:"official_site"}.png" alt="${kind||"official_site"}" height="100%"></span>${kind||l.kind}`,{href:l.url}))
+                            links.append(collections.materialItem(`<span class="icon"><img src="${shikimori.origin}/assets/blocks/b-external_links/${kind?l.kind:"official_site"}.png" alt="${kind||"official_site"}" height="100%"></span>${kind||l.kind}`,{href:l.url}))
                         })
                     })
                 },
@@ -524,7 +524,7 @@ $(function(){
                         case 1: return windows.open('title-info',tile)
                         case 2: return workers.favorite.toggle(tile)
                         case 4: return navigator.clipboard.writeText(tile.name)
-                        case 5: return window.open('https://shikimori.one'+tile.url)
+                        case 5: return window.open(shikimori.origin + tile.url)
                     }
                 }).on('open',e=>{
                     tile = JSON.parse(e.delegateTarget.dataset.add||"{}")
