@@ -53,7 +53,7 @@
             if (storageName != null) {
                 localStorage.removeItem(storageName);
             } else {
-                throw `File with name "${name}" isn't exists`;
+                return;
             }
 
             if (this._selfCheck && localStorage.getItem(storageName) != null) {
