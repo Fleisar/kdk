@@ -74,7 +74,7 @@
         get(name) {
             const storageName = this._storage.get(name);
             if (storageName == null) {
-                throw `File "${name}" does not exist`;
+                return null;
             }
 
             const content = localStorage.getItem(storageName);
