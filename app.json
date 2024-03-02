@@ -1,5 +1,5 @@
 {
-  "devMode": false,
+  "devMode": true,
   "shortName": "KDK",
   "name": "KDK Anime",
   "logo": "app/logo.svg",
@@ -10,10 +10,10 @@
   },
   "loadType": "self",
   "update": {
-    "release": 100,
+    "release": 102,
     "type": "release",
     "version": "3.1 stable",
-    "description": ""
+    "description": "ilkuyahiw7846hyrnoqiw383674rnhaop9wm8uy37fmn0paows8e3yurt09npawm834f,uapw8u"
   },
   "update_policy": "auto",
   "sources": [

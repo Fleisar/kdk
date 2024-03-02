@@ -9,7 +9,7 @@
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  padding: 1em;
+  padding: 5em 0;
   box-sizing: border-box;
   font-family: "Segoe UI",sans-serif;
   pointer-events: none;
@@ -33,6 +33,7 @@
     pointer-events: none;
     opacity: 1;
     transition: 2s opacity;
+    flex-direction: column;
     &.fade {
       opacity: 0;
     }
@@ -41,30 +42,80 @@
       max-height: max(10vh,10vw);
       width: min(50vw,50vh);
       height: min(50vw,50vh);
+
+      &:not([src]) {
+        opacity: 0;
+      }
+    }
+
+    h1 {
+      display: none;
+    }
+
+    progress {
+      height: 12px;
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid #999;
+      padding: 2px;
+      position: fixed;
+      bottom: 20vh;
+      width: 30vw;
+      min-width: 250px;
+
+      &:not([max]) {
+        opacity: 0;
+      }
+
+      &::-webkit-progress-bar {
+        background-color: #f0f0f0;
+      }
+
+      &::-webkit-progress-value {
+        background-color: #000;
+        border-radius: 999px;
+      }
     }
   }
   .window {
-    border: 1px solid #b2b2b2;
-    border-radius: 3px;
+    border-radius: 8px;
     padding: 1em;
-    background: linear-gradient(#ffffff, #dddddd);
-    width: 100%;
-    max-width: 720px;
-    text-shadow: 1px 1px #fff;
-    box-shadow: 0 6px 15px -2px #000;
+    background: #fff;
+    width: calc(100vw - 64px);
+    max-width: 500px;
+    box-shadow: 0 6px 15px -2px #0009;
     z-index: 2;
     pointer-events: auto;
+    overflow: hidden;
   }
   .updateRequest {
+
+    h3 {
+      margin: 0;
+    }
     p {
       max-height: 50vh;
-      overflow: hidden;
       overflow-y: auto;
+      overflow-wrap: anywhere;
+    }
+    .versions {
+      font-size: 12px;
     }
     button {
-      font-size: x-large;
-      width: 100px;
-      margin: 0 1em;
+      font-size: 18px;
+      text-transform: uppercase;
+      border: 1px solid #efefef;
+      background: #efefef;
+      border-radius: 8px;
+      width: 200px;
+      margin: 0.25em 1em;
+      padding: 0.5em;
+      transition: 0.2s;
+      cursor: pointer;
+
+      &:hover {
+        border-color: #aaa;
+      }
     }
   }
 }

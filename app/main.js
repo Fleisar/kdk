@@ -1,6 +1,6 @@
 $(function () {
-    const { readyDOM } = window.utils;
-    let url = new URI('#'),
+    const {readyDOM} = window.utils;
+    const url = new URI('#'),
         binds = {
             aPage: new Bind('a[data-page]', 'click'),
             aWindow: new Bind('a[data-window]', 'click'),
@@ -26,7 +26,7 @@ $(function () {
                     classes: ['externalLink']
                 }
             ], {classes: ['icon-list', 'ui-hovermenu', 'ui-material-list']}),
-            config: new configCollector({ config: { realtimeSearch: true } }),
+            config: new configCollector({config: {realtimeSearch: true}}),
             anilibria: new Anilibria(),
             kodik: new kodik('.page.player .player-kodik'),
             kodikBackend: new kodikBackend('07e3119af111900bf95bd7c9554430a4'),
@@ -91,8 +91,8 @@ $(function () {
                     </table>
                     <hr>
                     <ui class="icon-list ui-material-list">
-                        <li onclick="url.set('#player/shikimori/${data.id}',{})">Открыть</li>
-                        <li class="ui-disabled"><span class="material-icons icon">favorite</span>Любимое</li>
+                        <li onclick="window['KDK'].url.set('#player/shikimori/${data.id}',{})">Открыть</li>
+                        <li class="ui-disabled"><span class="material-icons icon">favorite</span>Любимое (${isFavorite})</li>
                         <li class="ui-disabled"><span class="material-icons icon">gps_not_fixed</span>Отслеживать</li>
                         <li onclick="window.open('${shikimori.origin}${data.url}')"><span class="icon" style="background-color:rgba(var(--colorFill),0.5)"><img alt="sk" src="${shikimori.origin}/assets/layouts/l-top_menu-v2/glyph.svg" height="24"></span>Открыть в Shikimori</li>
                     </ui>
@@ -317,8 +317,9 @@ $(function () {
                     binds.lazyLoad.update()
                 },
                 favorite() {
-                    let results = $('.window.favorite .results'), fav = worker.metric.favorite()
-                    results.html('')
+                    const results = document.querySelector('.window.favorite > .results');
+                    results.innerHTML = collections.noResults('Пока тут пусто, добавьте аниме через контекстное меню');
+                    const fav = worker.metric.favorite()
                     if (fav === false) return results.html(collections.noResults('Сбор данных отключён'))
                     Object.values(fav.get()).reverse().forEach(d => results.append(collections.title(d)))
                     binds.titleHigh.update()
@@ -524,8 +525,10 @@ $(function () {
             },
             favorite: {
                 init() {
+
                 },
                 toggle(data) {
+
                 },
             },
             clock: {
@@ -836,6 +839,10 @@ $(function () {
     // app link
     windows.bind()
     App.chrome.sw()
+    //
+    window["KDK"] = {
+        url,
+    };
     // debug info
     workers.console.log('Start loading...')
     workers.console.log(`Current version: ${App.info.update.version}(${App.info.update.release})`)

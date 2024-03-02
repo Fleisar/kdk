@@ -7,26 +7,25 @@
     <link id="icon" rel="icon" href="">
     <link rel="stylesheet" href="styles.css">
     <script src="utils.js"></script>
-    <script src="storage.js?2"></script>
+    <script src="storage.js"></script>
     <script src="app.core.js"></script>
 </head>
 <body>
     <div id="app-ui">
         <div class="window updateRequest" style="display:none">
-            <h3>«<a class="name">$APP</a>» require update</h3>
-            <span><a style="color:#a66c00">$VERSION_OLD</a> ➔ <a style="color:#0066a4">$VERSION_NEW</a></span>
+            <h3>Вышло обновление для «<a class="name">$APP</a>»</h3>
+            <span class="versions"><a style="color:#a66c00">$VERSION_OLD</a> ➔ <a style="color:#0066a4">$VERSION_NEW</a></span>
             <p>$DESCRIPTION</p>
             <hr/>
             <div style="text-align:center">
-                <button onclick="App.ui.window.close();App.skipUpdate()">Skip</button>
-                <button onclick="App.install(App.DEFAULT_MANIFEST,true)">Update</button>
+                <button onclick="App.ui.window.close();App.skipUpdate()">Пропустить</button>
+                <button onclick="App.install(App.DEFAULT_MANIFEST,true)">Обновить</button>
             </div>
         </div>
         <div class="loadScreen">
-            <div>
-                <img alt="logo" src="">
-                <h1>Loading...</h1>
-            </div>
+            <img alt="logo">
+            <h1>Loading...</h1>
+            <progress></progress>
         </div>
     </div>
 </body>

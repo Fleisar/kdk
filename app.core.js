@@ -8,6 +8,7 @@
             root: () => document.querySelector('#app-ui>.loadScreen'),
             icon: () => document.querySelector('#app-ui>.loadScreen img'),
             title: () => document.querySelector('#app-ui>.loadScreen h1'),
+            progress: () => document.querySelector('#app-ui>.loadScreen progress'),
         },
         updateModal: {
             versions: () => document.querySelectorAll('#app-ui>.window.updateRequest>span>a'),
@@ -85,7 +86,8 @@
          * @private
          */
         async _downloadAppSource(sources) {
-            for (const { url } of sources) {
+            for (let i = 0; i < sources.length; i += 1) {
+                const { url } = sources[i];
                 const content = await fetch(url)
                     .then((r) => {
                         if (!r.ok) {
@@ -99,6 +101,7 @@
                 }
 
                 storage.createFile(url, content);
+                this.progress(i + 1, sources.length);
             }
         },
 
@@ -161,7 +164,7 @@
 
         /**
          * Controls head title
-         * @param text {string | undefined}
+         * @param text {string?}
          * @return {string}
          */
         title(text) {
@@ -184,6 +187,18 @@
             }
 
             return DOM.head.icon().getAttribute('href');
+        },
+
+        /**
+         * Controls load screen progress
+         * @param value {number}
+         * @param max {number?}
+         */
+        progress(value, max) {
+            if (max != null) {
+                DOM.loadScreen.progress().setAttribute('max', max);
+            }
+            DOM.loadScreen.progress().setAttribute('value', value);
         },
 
         /**
@@ -221,7 +236,7 @@
              * @param manifest
              */
             updateDialog(manifest) {
-                const [oldVersion, newVersion] = DOM.updateModal.versions;
+                const [oldVersion, newVersion] = DOM.updateModal.versions();
                 oldVersion.innerText = `${app.info.update.version} (${app.info.update.release})`;
                 newVersion.innerText = `${manifest.update.version} (${manifest.update.release})`;
                 DOM.updateModal.title().innerText = app.info.name;
@@ -266,7 +281,7 @@
          */
         async checkUpdate(manifestUri = this._defaultManifest) {
             const manifest = await fetch(manifestUri).then((r) => r.json());
-            if (manifest.info.update.release !== this.update.release) {
+            if (manifest.update.release !== this.info.update.release) {
                 this.ui.updateDialog(manifest);
             }
         },

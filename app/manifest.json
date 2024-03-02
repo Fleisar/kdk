@@ -1,7 +1,7 @@
 {
   "name": "KDK Anime",
   "short_name": "KDK",
-  "start_url": "/",
+  "start_url": "/kdk/",
   "display": "standalone",
   "theme_color": "#4e4e4e",
   "background_color": "#f0f0f0",
