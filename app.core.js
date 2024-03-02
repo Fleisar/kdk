@@ -1,167 +1,303 @@
-(function(){
-    window.App = {
-        DEFAULT_MANIFEST: 'app.json',
-        info: false,
-        install(manifest,reload=false){
-            let startInstalling = (new Date()).getTime()
-            this._downloadManifest(manifest||this.DEFAULT_MANIFEST,r=>{
-                if(!this._checkTypes([r.name,r.update.release,r.sources],['string','number','object'])) throw `Invalid manifest`
-                this.uninstall()
-                App.info = r
-                let sources = 0
-                if(App.info.logo) document.querySelector('#app-ui>.loadScreen img').setAttribute('src',App.info.logo)
-                if(App.info.name) document.querySelector('#app-ui>.loadScreen h1').innerHTML = App.info.name
-                App.info.sources.forEach((source,i)=>{
-                    fetch(source.url).then(r=>{
-                        if(r.ok){
-                            let name = (new Date()).getTime()
-                            r.text().then(t=>{
-                                storage.createFile((name.toString()+i.toString()).toString(),t)
-                                App.info.sources[i].name = name.toString()+i.toString()
-                                sources++
-                                if(sources===App.info.sources.length){
-                                    this._saveConfig()
-                                    reload?window.location.reload():this.run(true)
-                                    App.info.dev_mode&&console.info(`App installed and ran for ${(new Date()).getTime()-startInstalling}ms`)
-                                }
-                            })
-                        } else throw `App's file cannot be downloaded`
-                    })
-                })
-            })
+(function () {
+    const DOM = {
+        head: {
+            title: () => document.querySelector('head>title'),
+            icon: () => document.querySelector('head>link#icon'),
         },
-        uninstall(){
-            App.info&&App.info.sources.forEach(source=>storage.deleteFile(source.name.toString()))
+        loadScreen: {
+            root: () => document.querySelector('#app-ui>.loadScreen'),
+            icon: () => document.querySelector('#app-ui>.loadScreen img'),
+            title: () => document.querySelector('#app-ui>.loadScreen h1'),
         },
-        run(install=false){
-            storage.build(App.info.sources)
-            let dom = ()=>{
-                if(App.info.application.name!==undefined){
-                    let meta = document.createElement('meta')
-                    meta.name = 'application-name'
-                    meta.content = App.info.application.name
-                    document.getElementsByTagName('head')[0].appendChild(meta)
-                }
-                if(App.info.application.manifest!==undefined){
-                    let link = document.createElement('link')
-                    link.rel = 'manifest'
-                    link.href = App.info.application.manifest
-                    document.getElementsByTagName('head')[0].appendChild(link)
-                }
-                if(App.info.logo) document.querySelector('#app-ui>.loadScreen img').setAttribute('src',App.info.logo)
-                if(App.info.name) document.querySelector('#app-ui>.loadScreen h1').innerHTML = App.info.name
-                if(App.info.icon) App.icon(App.info.icon[0],App.info.icon[1]||'icon')
-                App.title(App.info.short_name||App.info.name||'Application')
-                if(App.info.timeout) setTimeout(App.loaded, Number(App.info.timeout))
-                else if(!App.info.load_type||App.info.load_type==='default') this._load.add(this.loaded)
+        updateModal: {
+            versions: () => document.querySelectorAll('#app-ui>.window.updateRequest>span>a'),
+            title: () => document.querySelector('#app-ui>.window.updateRequest>h3>a.name'),
+            description: () => document.querySelector('#app-ui>.window.updateRequest>p'),
+        }
+    };
+    const storage = window.storage;
+    const {readyDOM} = window.utils;
+    const app = {
+        _naming: {
+            config: 'appConfig',
+        },
+        _serviceWorker: 'sw.js',
+        _defaultManifest: 'app.json',
+        info: null,
+
+        /**
+         * Install new App using manifest
+         * @param manifestName {string} Manifest URL
+         * @param reload {boolean} If page reload needed
+         */
+        async install(manifestName = this._defaultManifest, reload = false) {
+            const startInstalling = Date.now();
+            const manifest = await fetch(manifestName).then((r) => r.json());
+
+            if (manifest == null) {
+                throw 'Error white fetching manifest';
             }
-            document.readyState==='loading'?document.addEventListener('DOMContentLoaded',dom):dom()
-            if(install===true) App.info.install&&eval(`${App.info.install}()`)
-            App.info.running&&eval(`${App.info.running}()`)
-        },
-        title(text) {
-            if(text === undefined) return document.querySelector('head>title').innerText
-            return document.querySelector('head>title').innerText = text.toString(), this
-        },
-        icon(url,rel='icon') {
-            let icon = document.querySelector('head>link#icon')
-            if(url === undefined) return icon.getAttribute('href')
-            icon.setAttribute('href',url)
-            icon.setAttribute('rel',rel)
-            return this
-        },
-        loaded() {
-            let dom = ()=>{
-                let scene = document.querySelector('#app-ui>.loadScreen')
-                if(!scene.classList.contains('fade')) scene.classList.add('fade')
+
+            this.ui.appendMedia(manifest);
+
+            try {
+                manifest.sources.forEach(({ url }) => {
+                    storage.deleteFile(url);
+                });
+                await this._downloadAppSource(manifest.sources);
+            } catch (e) {
+                manifest.sources.forEach(({ url }) => {
+                    storage.deleteFile(url);
+                });
+                console.error(e);
+                throw `Failed to download source files. Installation aborted`;
             }
-            document.readyState==='loading'?document.addEventListener('DOMContentLoaded',dom):dom()
+
+            this.uninstall(manifest.sources);
+
+            this._saveManifest(manifest);
+
+            if (reload) {
+                window.location.reload();
+            } else {
+                this.run(true);
+            }
+
+            if (this.info.devMode) {
+                const installDuration = Date.now() - startInstalling;
+                console.info(`App installed for ${installDuration}ms`);
+            }
         },
-        skipUpdate(){
-            return App.info.update.release = Math.floor((new Date()).getTime()/1e3), this
+
+        /**
+         * Save and apply new manifest
+         * @param manifest {object}
+         * @private
+         */
+        _saveManifest(manifest) {
+            this.info = manifest;
+            this._saveConfig();
         },
-        chrome: {
-            sw(){
-                if(window.location.protocol!=='https:')return false
-                if (navigator.serviceWorker.controller) {
-                    console.log('[PWA Builder] active service worker found, no need to register')
-                } else {
-                    navigator.serviceWorker.register('sw.js').then(function(reg) {
-                        console.log('Service worker has been registered for scope:'+ reg.scope);
+
+        /**
+         * Download App's source files and store its
+         * @param sources
+         * @private
+         */
+        async _downloadAppSource(sources) {
+            for (const { url } of sources) {
+                const content = await fetch(url)
+                    .then((r) => {
+                        if (!r.ok) {
+                            return null;
+                        }
+                        return r.text();
                     });
+
+                if (content == null) {
+                    throw `Error while fetching source file "${url}"`;
+                }
+
+                storage.createFile(url, content);
+            }
+        },
+
+        /**
+         * Delete source files and clear saved manifest
+         * @param excludeFiles {object[]}
+         */
+        uninstall(excludeFiles) {
+            const excludeSet = new Set(excludeFiles.map(({ url }) => url));
+            if (this.info != null) {
+                this.info.sources.forEach(({ url }) => {
+                    if (!excludeSet.has(url)) {
+                        storage.deleteFile(url);
+                    }
+                });
+            }
+
+            this.info = null;
+            localStorage.removeItem(this._naming.config);
+        },
+
+        /**
+         * Run installed app
+         * @param install
+         */
+        run(install = false) {
+            this.info.sources.forEach((source) => {
+                storage.prepareDOMNode(source.url, source.type);
+            });
+
+            readyDOM(() => {
+                const meta = [];
+                const appNameMeta = document.createElement('meta');
+                appNameMeta.name = 'application-name';
+                appNameMeta.content = this.info.application.name;
+                meta.push(appNameMeta);
+                if (this.info.application.manifest) {
+                    const manifestMeta = document.createElement('link');
+                    manifestMeta.rel = 'manifest';
+                    manifestMeta.href = this.info.application.manifest;
+                    meta.push(manifestMeta);
+                }
+                document.head.append(...meta);
+                this.ui.appendMedia();
+
+                if (this.info.timeout) {
+                    setTimeout(this.loaded, Number(this.info.timeout));
+                } else {
+                    this.loaded();
+                }
+            });
+
+            if (install && this.info.install != null) {
+                eval(this.info.install);
+            }
+            if (this.info.running) {
+                eval(this.info.running);
+            }
+        },
+
+        /**
+         * Controls head title
+         * @param text {string | undefined}
+         * @return {string}
+         */
+        title(text) {
+            if (text != null) {
+                DOM.head.title().innerText = text;
+            }
+
+            return DOM.head.title().innerText;
+        },
+
+        /**
+         * Controls head icon
+         * @param url {string}
+         * @param rel {string}
+         */
+        icon(url, rel = 'icon') {
+            if (url != null) {
+                DOM.head.icon().setAttribute('href', url);
+                DOM.head.icon().setAttribute('rel', rel);
+            }
+
+            return DOM.head.icon().getAttribute('href');
+        },
+
+        /**
+         * On load callback function
+         */
+        loaded() {
+            readyDOM(() => {
+                DOM.loadScreen.root().classList.add('fade');
+            });
+        },
+
+        /**
+         * Hide update message
+         */
+        skipUpdate() {
+            this.info.update.release = Math.floor(Date.now() / 1e3);
+        },
+
+        chrome: {
+            /**
+             * Register service worker
+             */
+            sw() {
+                if (!navigator.serviceWorker.controller) {
+                    navigator.serviceWorker.register(app._serviceWorker)
+                        .then((reg) => {
+                            console.log('Service worker has been registered for scope:' + reg.scope);
+                        });
                 }
             }
         },
         ui: {
-            updateDialog(manifest){
-                let versions = document.querySelectorAll('#app-ui>.window.updateRequest>span>a')
-                versions[0].innerText = `${App.info.update.version} (${App.info.update.release})`
-                versions[1].innerText = `${manifest.update.version} (${manifest.update.release})`
-                document.querySelector('#app-ui>.window.updateRequest>h3>a.name').innerText = App.info.name
-                document.querySelector('#app-ui>.window.updateRequest>p').innerHTML = manifest.update.description
-                this.window.open('updateRequest')
+            /**
+             * Display update dialog
+             * @param manifest
+             */
+            updateDialog(manifest) {
+                const [oldVersion, newVersion] = DOM.updateModal.versions;
+                oldVersion.innerText = `${app.info.update.version} (${app.info.update.release})`;
+                newVersion.innerText = `${manifest.update.version} (${manifest.update.release})`;
+                DOM.updateModal.title().innerText = app.info.name;
+                DOM.updateModal.description().innerHTML = manifest.update.description;
+                this.window.open('updateRequest');
             },
             window: {
                 current: null,
-                open(name){
-                    if(this.current!==null) this.close()
-                    document.querySelector('#app-ui>.window.'+name).style.display = 'block'
-                    return this.current = name, this
+                select(name) {
+                    return document.querySelector('#app-ui>.window.' + name);
                 },
-                close(){
-                    document.querySelector('#app-ui>.window.'+this.current).style.display = 'none'
-                    return this.current = null, this
+                open(name) {
+                    if (this.current != null) {
+                        this.close();
+                    }
+                    this.select(name).style.display = 'block';
+                    this.current = name;
+                },
+                close() {
+                    this.select(this.current).style.display = 'none';
+                    this.current = null;
+                }
+            },
+            appendMedia(manifest = app.info) {
+                readyDOM(() => {
+                    app.title(manifest.name);
+                    DOM.loadScreen.title().innerText = manifest.name;
+                    if (manifest.logo) {
+                        DOM.loadScreen.icon().setAttribute('src', manifest.logo);
+                    }
+                    if (manifest.icon) {
+                        app.icon(...manifest.icon);
+                    }
+                });
+            }
+        },
+
+        /**
+         * check new manifest for updates
+         * @param manifestUri
+         * @return {Promise<void>}
+         */
+        async checkUpdate(manifestUri = this._defaultManifest) {
+            const manifest = await fetch(manifestUri).then((r) => r.json());
+            if (manifest.info.update.release !== this.update.release) {
+                this.ui.updateDialog(manifest);
+            }
+        },
+
+        _init() {
+            const appConfigData = localStorage.getItem(this._naming.config);
+            let appConfig;
+            try {
+                appConfig = JSON.parse(appConfigData);
+            } catch (e) {
+                throw 'Error while reading app config';
+            }
+
+            this.info = appConfig;
+
+            if (appConfig == null || this.info.devMode) {
+                this.install();
+            } else {
+                this.run();
+
+                if (this.info.updatePolicy === 'auto') {
+                    this.checkUpdate();
                 }
             }
         },
-        checkUpdate(manifest){
-            this._checkUpdate(manifest||this.DEFAULT_MANIFEST,(m,v)=>{
-                !v&&this.ui.updateDialog(m)
-            })
+        _saveConfig() {
+            const appConfigData = JSON.stringify(this.info);
+            localStorage.setItem(this._naming.config, appConfigData);
         },
-        _checkUpdate(manifest,handler){
-            this._downloadManifest(manifest||this.DEFAULT_MANIFEST,r=>{
-                handler(r,r.update.type==='release'?r.update.release<=App.info.update.release:true)
-            })
-        },
-        _load: {
-            state: false,
-            init(){
-                if(document.readyState==='complete') return (this.state=true, this.query.length>0&&this.query.forEach(f=>f()))
-                document.addEventListener('readystatechange',()=>{
-                    if(document.readyState==='complete') this.query.length>0&&this.query.forEach(f=>f())
-                    this.state = true
-                })
-            },
-            query: [],
-            add(handler){
-                if(typeof handler !== 'function') throw 'Handler must be a function'
-                if(this.state||document.readyState==='complete') return handler(), this
-                return this.query.push(handler), this
-            }
-        },
-        _init(){
-            let app = localStorage.getItem('Application')
-            if(app!==null){
-                this._load.init()
-                App.info = JSON.parse(app)
-                if(App.info.dev_mode) this.install()
-                else this.run()
-                if(App.info.update_policy.auto) this.checkUpdate(this.DEFAULT_MANIFEST)
-            }
-        },
-        _saveConfig(){localStorage.setItem('Application',JSON.stringify(App.info))},
-        _downloadManifest(manifest,callback){
-            if(!this._checkTypes([manifest,callback],['string','function'])) throw `Invalid input variables`
-            fetch(manifest+"?"+(new Date()).getTime()).then(r=>{
-                if(r.ok) r.json().then(j=>callback(j))
-                else throw `Unable to download manifest`
-            })
-        },
-        _checkTypes(variables, types){
-            if(typeof variables !== 'object' || typeof types !== 'object' || variables.length !== types.length) throw `Invalid construction`
-            return variables.filter((o,i)=>{if(typeof o === types[i])return true}).length === variables.length
-        }
     }
-    App._init()
+    app._init();
+
+    window.App = app;
 })()

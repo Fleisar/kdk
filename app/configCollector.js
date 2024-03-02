@@ -4,24 +4,28 @@
         this._keeper = {
             update: []
         }
-        this.config = {}
+        this.config = options.config ?? {}
         this.update()
+        this._refresh();
         if(this._load()) {
             this.config = JSON.parse(localStorage.getItem('configCollector'))
             $(()=>{
-                Object.keys(this.config).forEach(k=>{
-                    this._keeper.update.length>0&&this._keeper.update.forEach(f=>f(k,this.config[k]))
-                    let e = $(`.${this.class}[name=${k}]`)
-                    switch(e[0].tagName){
-                        case 'INPUT': if(e[0].type === 'checkbox') return e.prop('checked',this.config[k])
-                        case 'SELECT':
-                        default: return e.val(this.config[k])
-                    }
-                })
+                this._refresh();
             })
         }
     }
     window.configCollector.prototype = {
+        _refresh() {
+            Object.keys(this.config).forEach(k=>{
+                this._keeper.update.length>0&&this._keeper.update.forEach(f=>f(k,this.config[k]))
+                let e = $(`.${this.class}[name=${k}]`)
+                switch(e[0].tagName){
+                    case 'INPUT': if(e[0].type === 'checkbox') return e.prop('checked',this.config[k])
+                    case 'SELECT':
+                    default: return e.val(this.config[k])
+                }
+            })
+        },
         update(){
             $(`.${this.class}`).unbind('change').change(e=>{
                 this.config[e.target.name] = this._value(e.target)

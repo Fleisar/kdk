@@ -1,6 +1,6 @@
 /* API docs (official): https://shikimori.one/api/doc/1.0 */
 (function(){
-    const SHIKIMORI_ORIGIN = '//shikimori.me';
+    const SHIKIMORI_ORIGIN = 'https://shikimori.one';
     window.shikimori = {
         origin: SHIKIMORI_ORIGIN,
         api: `${SHIKIMORI_ORIGIN}/api`,

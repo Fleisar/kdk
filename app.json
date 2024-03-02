@@ -1,6 +1,6 @@
 {
-  "dev_mode": true,
-  "short_name": "KDK",
+  "devMode": false,
+  "shortName": "KDK",
   "name": "KDK Anime",
   "logo": "app/logo.svg",
   "icon": ["app/logo.png","image/png"],
@@ -8,16 +8,14 @@
     "name": "KDK",
     "manifest": "app/manifest.json"
   },
-  "load_type": "self",
+  "loadType": "self",
   "update": {
     "release": 100,
     "type": "release",
     "version": "3.1 stable",
     "description": ""
   },
-  "update_policy": {
-    "auto": true
-  },
+  "update_policy": "auto",
   "sources": [
     {
       "url": "https://fonts.googleapis.com/css2?family=Roboto&display=swap",

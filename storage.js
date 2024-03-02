@@ -1,142 +1,211 @@
-(function(){
-    window.storage = {
-        STORAGE_PREFIX: 'storage-',
-        VERSION: 1,
-        CONTENT_LENGTH_LIMIT: 1e6,
-        CHECK_FILE_AFTER_ACTION: true,
-        SAVE_CONFIG_AFTER_ACTION: true,
-        createFile(name, content){
-            if(!this._checkTypes([name,content],['string','string'])) throw `Invalid input variables`
-            if(content.length > this.CONTENT_LENGTH_LIMIT) throw `File content length must be less ${this.CONTENT_LENGTH_LIMIT}`
-            if(this._storage.indexes.indexOf(name) !== -1) throw `File with name "${name}" is already exists`
-            localStorage.setItem(this.STORAGE_PREFIX+name,content)
-            if(this.CHECK_FILE_AFTER_ACTION&&localStorage.getItem(this.STORAGE_PREFIX+name)===null) throw `Unable to save file "${name}"`
-            this._storage.indexes.push(name)
-            return this.SAVE_CONFIG_AFTER_ACTION&&this._saveConfig(),this
+(function () {
+    const {readyDOM} = window.utils;
+    const storage = {
+        _prefix: 'storage-',
+        _naming: {
+            indexes: 'storageIndexes',
         },
-        deleteFile(name){
-            if(!this._checkTypes([name],['string'])) throw `Invalid input variables`
-            let index = this._storage.indexes.indexOf(name)
-            if(index === -1) throw `File with name "${name}" isn't exists`
-            localStorage.removeItem(this.STORAGE_PREFIX+name)
-            if(this.CHECK_FILE_AFTER_ACTION&&localStorage.getItem(this.STORAGE_PREFIX+name)!==null) throw `Unable to delete file "${name}"`
-            this._storage.indexes.splice(index,1)
-            return this.SAVE_CONFIG_AFTER_ACTION&&this._saveConfig(),this
+        _version: 2,
+        _sizeLimit: 1e6,
+        _selfCheck: true,
+        _autoSave: true,
+        _canOverwrite: false,
+        _saveTimeout: 5e3,
+
+        _storage: new Map(),
+        _saveQueue: null,
+
+        /**
+         * Create file record in storage
+         * @param name {string} Name of the file
+         * @param content {string} Should be limited by size limit (1000000 by default)
+         * */
+        createFile(name, content) {
+            const storageName = `${this._prefix}${this._storage.size}`;
+
+            if (content.length > this._sizeLimit) {
+                throw `File content length must be less ${this._sizeLimit}`;
+            }
+
+            if (this._canOverwrite || !this._storage.has(name)) {
+                localStorage.setItem(storageName, content);
+            } else {
+                throw `File with name "${name}" is already exists`;
+            }
+
+            if (this._selfCheck && localStorage.getItem(storageName) == null) {
+                throw `Error white writing "${name}" in storage`;
+            } else {
+                this._storage.set(name, storageName);
+            }
+
+            if (this._autoSave) {
+                this.saveIndexes();
+            }
         },
-        get(name){
-            if(!this._checkTypes([name],['string'])) throw `Invalid input variables`
-            if(this._storage.indexes.indexOf(name) === -1) throw `File with name "${name}" isn't exists`
-            return localStorage.getItem(this.STORAGE_PREFIX+name)
+
+        /**
+         * Delete file record from storage
+         * @param name {string} Name of the file
+         */
+        deleteFile(name) {
+            const storageName = this._storage.get(name);
+            if (storageName != null) {
+                localStorage.removeItem(storageName);
+            } else {
+                throw `File with name "${name}" isn't exists`;
+            }
+
+            if (this._selfCheck && localStorage.getItem(storageName) != null) {
+                throw `Error white erasing "${name}" from storage`;
+            } else {
+                this._storage.delete(name);
+            }
+
+            if (this._autoSave) {
+                this.saveIndexes();
+            }
         },
-        embed(name,type){
-            if(!this._checkTypes([name,type],['string','string'])) throw `Invalid input variables`
-            if(this._storage.indexes.indexOf(name) === -1) throw `File with name "${name}" isn't exists`
-            let content = localStorage.getItem(this.STORAGE_PREFIX+name),blob,element
-            switch(type){
-                case 'script':
-                    blob = new Blob([content],{type:'text/javascript'})
-                    element = document.createElement('script')
-                    element.src = URL.createObjectURL(blob)
-                    return document.getElementsByTagName('head')[0].appendChild(element)
-                case 'style':
-                    blob = new Blob([content],{type:'text/css'})
-                    element = document.createElement('link')
-                    element.href = URL.createObjectURL(blob)
-                    element.rel = 'stylesheet'
-                    return document.getElementsByTagName('head')[0].appendChild(element)
+
+        /**
+         * Returns file content if it's exist
+         * @param name {string}
+         */
+        get(name) {
+            const storageName = this._storage.get(name);
+            if (storageName == null) {
+                throw `File "${name}" does not exist`;
+            }
+
+            const content = localStorage.getItem(storageName);
+
+            if (this._selfCheck && content == null) {
+                throw `Error while reading "${name}" from storage`;
+            }
+
+            return content;
+        },
+
+        /**
+         * Generate DOM Node for embedding
+         * @param name {string}
+         * @param type {string}
+         */
+        prepareDOMNode(name, type) {
+            const content = this.get(name);
+            let blob, element;
+
+            switch (type) {
+                case 'script': {
+                    blob = new Blob([content], {type: 'text/javascript'});
+                    element = document.createElement('script');
+                    element.src = URL.createObjectURL(blob);
+                    element.dataset.name = name;
+
+                    readyDOM(() => {
+                        document.head.appendChild(element);
+                    });
+                    break;
+                }
+                case 'style': {
+                    blob = new Blob([content], {type: 'text/css'});
+                    element = document.createElement('link');
+                    element.href = URL.createObjectURL(blob);
+                    element.rel = 'stylesheet';
+                    element.dataset.name = name;
+
+                    readyDOM(() => {
+                        document.head.appendChild(element);
+                    });
+                    break;
+                }
                 case 'html':
-                default:
-                    this._onload.push(()=>{
-                        document.getElementsByTagName('body')[0].innerHTML += content
-                    })
+                default: {
+                    element = document.createElement('div');
+                    element.dataset.name = name;
+                    element.innerHTML = content;
+
+                    readyDOM(() => {
+                        document.body.appendChild(element);
+                    });
+                    break;
+                }
+            }
+        },
+
+        /**
+         * @param name {string}
+         * @return {boolean}
+         */
+        isExists(name) {
+            return this._storage.has(name);
+        },
+
+        /**
+         * Load storage indexes
+         * @private
+         */
+        _loadIndexes() {
+            const storageIndexesJSON = localStorage.getItem(this._naming.indexes);
+            let storageIndexes;
+
+            try {
+                storageIndexes = Object.entries(JSON.parse(storageIndexesJSON ?? '{}'));
+            } catch (e) {
+                throw `Error while reading storage config`;
             }
 
-        },
-        build(sources,closed=true){
-            let scripts='',styles='',html=''
-            sources.forEach(i=>{
-                let file
-                try {file=this.get(i.name)}
-                catch(e){throw 'Unable to build sources'}
-                switch(i.type){
-                    case 'script':scripts += `${file};\n`;break
-                    case 'style':styles += file.split(/\n/).join('');break
-                    default: case 'html':html += file.split(/\n/).join('')
-                }
-            })
-            if(scripts!==''){
-                let blob = new Blob([closed?`(function(){${scripts}})()`:scripts],{type:'text/javascript'})
-                let element = document.createElement('script')
-                element.src = URL.createObjectURL(blob)
-                element.type = 'text/javascript'
-                this.domQuery.add(()=>document.getElementsByTagName('head')[0].appendChild(element))
+            if (storageIndexes == null) {
+                return;
             }
-            if(styles!==''){
-                let blob = new Blob([styles],{type:'text/css'})
-                let element = document.createElement('link')
-                element.href = URL.createObjectURL(blob)
-                element.rel = 'stylesheet'
-                this.domQuery.add(()=>document.getElementsByTagName('head')[0].appendChild(element))
-            }
-            if(html!==''){
-                this.domQuery.add(()=>{
-                    document.getElementsByTagName('body')[0].innerHTML += html
-                })
-            }
-        },
-        domQuery: {
-            loaded: false,
-            init(){
-                if(document.readyState!=='loading') return this.loaded=true
-                document.addEventListener('DOMContentLoaded',()=>{
-                    this._handlers.forEach(f=>f())
-                    this.loaded = true
-                })
-            },
-            _handlers: [],
-            add(handler){
-                if(typeof handler !== 'function') throw 'Handler must be a function'
-                if(this.loaded) handler()
-                return this._handlers.push(handler), this
-            },
 
+            this._storage = new Map(storageIndexes);
         },
-        isExists: name => storage._storage.indexes.indexOf(name) !== -1,
-        repairIndexes(action = 'delete'){
-            if(!this._checkTypes([action],['string'])) throw `Invalid input variables`
-            let state = this._checkIndexes()
-            this._storage.forEach((e,i)=>{
-                if(state[i]) return
-                switch(action){
-                    case 'create':
-                        localStorage.setItem(this.STORAGE_PREFIX+e[0],'')
-                        break;
-                    case 'delete':
-                    default:
-                        this._storage.indexes.splice(e[1],1)
-                }
-            })
-            if(this._checkIndexes().length===this._storage.indexes.length) return this._saveConfig(),true
-            else throw `Unable to recovery, changes ain't saved`
-        },
-        _saveConfig(){localStorage.setItem('storageConfig',JSON.stringify(this._storage))},
-        _checkTypes(variables, types){
-            if(typeof variables !== 'object' || typeof types !== 'object' || variables.length !== types.length) throw `Invalid construction`
-            return variables.filter((o,i)=>{if(typeof o === types[i])return o}).length === variables.length
-        },
-        _init(){
-            let storageConfig = localStorage.getItem('storageConfig')
-            if(storageConfig===null){
-                storageConfig=JSON.stringify({version:1,indexes:[]})
-                localStorage.setItem('storageConfig',storageConfig)
+
+        /**
+         * Save storage indexes with queue delay
+         */
+        saveIndexes(timeout = this._saveTimeout) {
+            if (this._saveQueue != null) {
+                return;
             }
-            this.domQuery.init()
-            this._storage = JSON.parse(storageConfig)
+
+            const timeoutFn = () => {
+                this._saveQueue = null;
+                this._saveIndexes();
+            }
+
+            setTimeout(timeoutFn, timeout);
         },
-        _checkIndexes(){
-            return this._storage.indexes.map(index => localStorage.getItem(this.STORAGE_PREFIX+index)!==null)
+
+        /**
+         * Save storage indexes
+         */
+        _saveIndexes() {
+            const indexObject = Object.fromEntries(this._storage.entries());
+            const json = JSON.stringify(indexObject);
+
+            localStorage.setItem(this._naming.indexes, json);
         },
-        _storage: undefined
+
+        /**
+         * Check storage indexes
+         * @return {string[]}
+         * @private
+         */
+        _checkIndexes() {
+            const failed = [];
+            for (const [name, storageName] of this._storage.entries()) {
+                if (localStorage.getItem(storageName) == null) {
+                    failed.push(name);
+                }
+            }
+
+            return failed;
+        },
     }
-    storage._init()
+    storage._loadIndexes();
+    window.addEventListener('beforeunload', storage._saveIndexes.bind(storage));
+
+    window.storage = storage;
 })()

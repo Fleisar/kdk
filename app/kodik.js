@@ -36,7 +36,9 @@
 
             this._a.on[a].forEach(f=>f(d.data))
         })
-        if((this.SELF=document.querySelector(selector))===null)throw'Kodik player not found'
+        if((this.SELF=document.querySelector(selector))===null) {
+            console.warn('Kodik player not found');
+        }
         Object.keys(this._a).forEach(p=>Object.keys(this._a[p]).forEach(a=>this[p+'_'+a]=h=>this[p](a,h)))
     }
     window.kodik.prototype = {

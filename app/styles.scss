@@ -364,7 +364,7 @@ div.windows {
                 color: rgba(var(--colorText),.5);
               }
               &:focus {
-                text-shadow: 0 0 10px rgb(var(--colorText));
+                font-weight: bold;
               }
             }
           }
@@ -546,20 +546,6 @@ footer {
       position: relative;
       z-index: 1;
       background-color: rgb(var(--colorFill));
-    }
-    &::before, &::after {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      box-shadow: 0 0 0 var(--borderUI) rgb(var(--colorBackground)), 0 0 0 calc(var(--borderUI) * 3) rgb(var(--colorFill)), 0 0 0 calc(var(--borderUI) * 5) rgb(var(--colorBackground));
-      transition: calc(var(--animationUI) * 1.5) cubic-bezier(0.68, -0.55, 0.27, 1.55);
-      z-index: 1;
-    }
-    &::before {
-      transition: calc(var(--animationUI) * 2) cubic-bezier(0.68, -0.55, 0.27, 1.55);
     }
     &.favorite::before {
       content: 'favorite';
