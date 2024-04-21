@@ -6,7 +6,6 @@
         }
         this.config = options.config ?? {}
         this.update()
-        this._refresh();
         if(this._load()) {
             this.config = JSON.parse(localStorage.getItem('configCollector'))
             $(()=>{
@@ -35,6 +34,7 @@
         },
         change(handler){
             if(typeof handler !== 'function') throw 'Handler must be a function'
+            handler(this.config);
             this._keeper.update.push(handler)
         },
         collect(){

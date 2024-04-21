@@ -9,7 +9,7 @@ body {
 
   --titleWidth: 225;
   --titleHeight: 318;
-  --titleGap: 8px;
+  --titleGap: 16px;
 
   --pageWidth: calc(100vw - var(--headerWidth));
   --pageHeight: calc(var(--vh) * 100 - var(--footerHeight));
@@ -45,7 +45,7 @@ body {
   --hoverRadius: 100px;
   --sizeUI: 20px;
   --generalRowCount: 7;
-  --listiconSize: 30px;
+  --listiconSize: 28px;
   --animationUI: 0.2s;
   --borderUI: 1px;
 }
@@ -448,7 +448,8 @@ footer {
       font-size: initial;
       background-color: rgb(var(--colorBackground));
       list-style: none;
-      padding: 0;
+      padding: 4px;
+      border-radius: 8px;
       margin: 0;
     }
     & > a {
@@ -456,14 +457,36 @@ footer {
     }
     & > li, & > a > li {
       & {
-        padding: 0.25em 1em;
+        padding: 4px 16px;
+        border-radius: 4px;
         background-color: transparent;
         transition: .2s;
         color: rgb(var(--colorText));
         cursor: pointer;
         position: relative;
+        margin-bottom: 4px;
+        overflow: hidden;
+        min-height: 1.2em;
       }
-      &:hover, &.active {
+      &.icon {
+        padding: 4px 0 !important;
+        width: var(--listiconSize);
+      }
+      & .icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        font-size: 1.2em;
+        width: var(--listiconSize);
+      }
+      &:last-child {
+        margin-bottom: 0;
+      }
+      &.ui-inactive {
+        cursor: default;
+      }
+      &:not(.ui-inactive):hover, &.active {
         background-color: rgb(var(--colorFill));
         color: rgb(var(--colorBackground));
         transition: .1s;
@@ -472,8 +495,10 @@ footer {
   }
   &-disabled {
     opacity: 0.5;
-    cursor: default;
     pointer-events: none;
+  }
+  &-float {
+    float: left;
   }
   &-scroller {
     height: calc(var(--titleHeight) * 1px + var(--titleGap) + var(--scrollbarHeight));
@@ -546,6 +571,7 @@ footer {
       position: relative;
       z-index: 1;
       background-color: rgb(var(--colorFill));
+      border-radius: 8px;
     }
     &.favorite::before {
       content: 'favorite';
@@ -562,15 +588,26 @@ footer {
       background-size: 100%;
       transition: var(--animationUI);
     }
+    .preview {
+      > div {
+        top: 0;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background-size: contain;
+        background-position: center;
+        background-repeat: no-repeat;
+
+        &.backdrop {
+          background-size: cover;
+          filter: blur(4px);
+          transform: scale(1.1);
+        }
+      }
+    }
     &:not(.inactive):hover {
-      & > div {
-        background-size: 120%;
-      }
-      &:before {
-        transform: scale(0.9);
-      }
-      &:after {
-        transform: scale(0.8);
+      & > .preview {
+        transform: scale(1.2);
       }
     }
   }
@@ -669,7 +706,8 @@ footer {
   }
   &-table-v {
     td {
-      box-shadow: 0 0 0 var(--borderUI) rgba(var(--colorFill),0.5);
+      border-bottom: 1px solid rgba(var(--colorFill), 0.3);
+      padding-top: 4px;
       &:first-child {
         font-weight: bold;
       }
@@ -880,14 +918,9 @@ h1, h2, h3, h4, h5, h6 {
       padding-left: calc(var(--listiconSize) + 0.1em)!important;
     }
     & > .icon {
-      display: flex;
-      align-items: center;
-      justify-content: center;
       position: absolute;
       left: 0;
       top: 0;
-      height: 100%;
-      width: var(--listiconSize);
     }
   }
 }

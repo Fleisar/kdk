@@ -45,44 +45,16 @@
             </div>
             <h3><i class="material-icons">menu</i> Настройки меню</h3>
             <div class="ui-grid">
-                <div class="ui-disabled">
-                    <input id="Gnxy6Rh2" type="checkbox" name="showReleases" class="ui-switch config-collector">
-                    <label for="Gnxy6Rh2">Показывать расписание релизов</label>
-                </div>
                 <div>
                     <input id="5QCpQWnW" type="checkbox" name="showHistory" class="ui-switch config-collector">
                     <label for="5QCpQWnW">Показывать историю просмотров</label>
-                </div>
-                <div>
-                    <input id="EQF5jjf6" type="checkbox" name="showFavorite" class="ui-switch config-collector">
-                    <label for="EQF5jjf6">Показывать список любимого</label>
-                </div>
-                <div class="ui-disabled">
-                    <input id="EQF5jhf6" type="checkbox" name="showTracking" class="ui-switch config-collector">
-                    <label for="EQF5jhf6">Показывать список отслеживания</label>
                 </div>
             </div>
             <h3><i class="material-icons">play_arrow</i> Плеер</h3>
             <div class="ui-grid">
                 <div class="ui-disabled">
-                    <input id="FQF5jhf6" type="checkbox" name="disableAds" class="ui-switch config-collector">
-                    <label for="FQF5jhf6">Отключить рекламу</label>
-                </div>
-                <div class="ui-disabled">
                     <input id="HQF5jhf6" type="checkbox" name="pauseOnBlur" class="ui-switch config-collector">
                     <label for="HQF5jhf6">Ставить на паузе при потери фокуса приложения</label>
-                </div>
-                <div class="ui-disabled">
-                    <input id="HQF5thf6" type="checkbox" name="pauseOnMin" class="ui-switch config-collector">
-                    <label for="HQF5thf6">Ставить на паузе при сворачивании проигрывателя</label>
-                </div>
-                <div class="ui-disabled">
-                    <input id="HQH5thf6" type="checkbox" name="showSkip" class="ui-switch config-collector">
-                    <label for="HQH5thf6">Показывать кнопку пропуска времени</label>
-                </div>
-                <div class="ui-disabled">
-                    <span>Время пропуска в секундах</span>
-                    <input class="ui-input config-collector" type="number" min="1" max="300" step="1" value="90" name="skipDuration">
                 </div>
                 <div>
                     <span>Внешний вид плеера</span>
@@ -128,10 +100,6 @@
                     <input id="pXQPrP7b" type="checkbox" name="collectInformation" class="ui-switch config-collector">
                     <label for="pXQPrP7b">Собирать информацию об использовании</label>
                 </div>
-                <div class="ui-disabled">
-                    <input id="nxe2LUhn" type="checkbox" name="sendInformation" class="ui-switch config-collector">
-                    <label for="nxe2LUhn">Отправлять данные на сервера</label>
-                </div>
             </div>
             <h3><i class="material-icons">storage</i> Хранилище</h3>
             <div class="ui-grid storage">
@@ -147,7 +115,6 @@
             <div class="ui-grid col-2">
                 <button onClick="App.checkUpdate()">Проверить обновления</button>
                 <button onClick="App.install(App.DEFAULT_MANIFEST,true)">Принудительно обновить</button>
-                <button class="ui-disabled">Конвертация старых данных</button>
                 <button onClick="localStorage.clear();location.reload()">Сбросить</button>
             </div>
             <div class="ui-grid">
