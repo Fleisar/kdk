@@ -50,11 +50,11 @@
       "type": "script"
     },
     {
-      "url": "https://cdn.jsdelivr.net/npm/hotkeys-js@3.7.3/dist/hotkeys.js",
+      "url": "https://raw.githubusercontent.com/jaywcjlove/hotkeys-js/a595c55587bb71ef251c5717549854e9c73c2b8f/dist/hotkeys.min.js",
       "type": "script"
     },
     {
-      "url": "https://cdn.jsdelivr.net/npm/vanilla-lazyload@17.3.0/dist/lazyload.js",
+      "url": "https://raw.githubusercontent.com/verlok/vanilla-lazyload/ae415e6fa7347acad2bb0db4f3f47e80aa39e82c/dist/lazyload.min.js",
       "type": "script"
     },
     {

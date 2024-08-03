@@ -4,14 +4,14 @@
         this._keeper = {
             update: []
         }
-        this.config = options.config ?? {}
-        this.update()
+        this.config = options.config ?? {};
+        this.update();
         if(this._load()) {
             this.config = JSON.parse(localStorage.getItem('configCollector'))
-            $(()=>{
-                this._refresh();
-            })
         }
+        $(()=>{
+            this._refresh();
+        })
     }
     window.configCollector.prototype = {
         _refresh() {
