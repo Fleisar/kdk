@@ -19,23 +19,15 @@ $(function () {
     const url = new URI('#'),
         binds = {
             aPage: new Bind('a[data-page]', 'click'),
-            aWindow: new Bind('a[data-window]', 'click'),
+            aWindow: new Bind('[data-window]', 'click'),
             hover: new Bind('header a', 'mousemove'),
             bodyScroll: new Bind('.page.general', 'scroll'),
             lazyLoad: new LazyLoad({}),
             titleHover: new hoverMenu('.ui-title', [
                 'Открыть',
                 '<span class="material-icons icon">info</span>Информация',
-                {
-                    text: '<span class="material-icons icon">favorite</span>Любимое',
-                    action: 'stay',
-                    classes: ['ui-disabled']
-                },
-                {
-                    text: '<span class="material-icons icon">gps_not_fixed</span>Отслеживать',
-                    action: 'stay',
-                    classes: ['ui-disabled']
-                },
+                '<span class="material-icons icon">playlist_add</span>Добавить в коллекцию',
+                '<span class="material-icons icon">playlist_remove</span>Удалить из коллекции',
                 '<span class="material-icons icon">content_copy</span>Скопировать название',
                 {
                     text: `<span class="icon">${shikimoriIcon}</span>Открыть в Shikimori`,
@@ -48,6 +40,7 @@ $(function () {
             kodikBackend: new kodikBackend('07e3119af111900bf95bd7c9554430a4'),
             sHistory: new listStorage('sHistory'),
             sFavorite: new listStorage('sFavorite'),
+            sCollections: new listStorage('sCollections'),
             titleHigh: new Bind('.ui-title', 'mousemove')
         },
         toRGB = function (hex) {
@@ -168,6 +161,22 @@ $(function () {
             },
             filterItem(name, title, options) {
                 return `<div class="ui-select"><span>${title}</span><select name="${name}">${Object.values(options).map(i => `<option value="${i.value}" ${i.selected ? 'selected' : ''}>${i.name}</option>`).join('')}</select><i class="material-icons">expand_more</i></div>`
+            },
+            collection(name, data) {
+                const template = new Template('template-collection');
+                return template.clone({ data, name });
+            },
+            collectionBreadcrumb(name) {
+                const template = new Template('template-collection-breadcrumb');
+                return template.clone({ name });
+            },
+            collectionAdd() {
+                const template = new Template('template-collection-alert');
+                return template.clone({ text: 'Чтобы добавить тайтл в коллекцию, выберите её в списке ниже' });
+            },
+            collectionRemove() {
+                const template = new Template('template-collection-alert');
+                return template.clone({ text: 'Чтобы удалить тайтл из коллекции, выберите её в списке ниже' });
             }
         },
         config = (k, v) => {
@@ -180,6 +189,8 @@ $(function () {
                     return $('.ui-clock').attr('display', v.toString());
                 case 'showReleases':
                     return $('header [data-window=releases]').attr('display', v.toString())
+                case 'showCollection':
+                    return $('header [data-window=collections]').attr('display', v.toString())
                 case 'showHistory':
                     return $('header [data-window=history]').attr('display', v.toString())
                 case 'showFavorite':
@@ -207,9 +218,9 @@ $(function () {
             current: null,
             bind() {
                 binds.aWindow.bind(e => {
-                    let data = JSON.parse(e.delegateTarget.dataset.add || "{}")
+                    let data = JSON.parse(e.delegateTarget.dataset.add || "null")
                         , name = e.delegateTarget.dataset.window
-                    if (name === this.current && this.container) return this.close()
+                    if (name === this.current && this.container && data == null) return this.close()
                     return this.open(name, data)
                 }, 'windows.bind')
                 $('.windows').click(e => {
@@ -277,6 +288,7 @@ $(function () {
                             links.append(collections.materialItem(`<span class="icon"><img src="${shikimori.origin}/assets/blocks/b-external_links/${kind ? l.kind : "official_site"}.png" alt="${kind || "official_site"}" height="100%"></span>${kind || l.kind}`, {href: l.url}))
                         })
                     })
+                    binds.aWindow.update();
                 },
                 search: data => {
                     if (data.text) {
@@ -356,6 +368,71 @@ $(function () {
                     Object.values(fav.get()).reverse().forEach(d => results.append(collections.title(d)))
                     binds.titleHigh.update()
                     binds.lazyLoad.update()
+                },
+                collections(data) {
+                    const results = $('.window.collections .result').html('');
+                    const titleList = $('.window.collections .titles').html('');
+                    const cll = workers.metric.collections();
+                    if (cll === false) {
+                        results.html(collections.noResults('Сбор данных отключён'));
+                        return;
+                    }
+                    const renderList = () => {
+                        const list = cll.get().reverse();
+                        results.html(list.length > 0
+                            ? ''
+                            : collections.noResults('Пока тут пусто')
+                        );
+
+                        list.forEach((d) => results.append(
+                            collections.collection(d.name, {
+                                id: d.id,
+                                name: d.name,
+                                new: data != null ? data.title : undefined,
+                                delete: data != null ? data.remove : undefined,
+                            }),
+                        ));
+                        binds.aWindow.update();
+                    }
+                    renderList();
+
+                    if (data == null) {
+                        return;
+                    }
+
+                    if (data.id === null) {
+                        const newCollectionName = prompt('Название новой коллекции');
+                        if (newCollectionName == null) {
+                            return;
+                        }
+                        cll.push({ id: Date.now(), name: newCollectionName });
+                        renderList();
+                    }
+                    if (data.id != null) {
+                        const listStorage = new ListStorage(`collection-${data.id}`);
+                        results.html('');
+                        if (data.new != null && !listStorage.has(data.new.id)) {
+                            listStorage.push(data.new);
+                        }
+                        if (data.delete != null) {
+                            listStorage.delete(data.delete);
+                        }
+                        const items = listStorage.get().reverse();
+                        results.append(collections.collectionBreadcrumb(data.name));
+                        items.forEach((d) => {
+                            titleList.append(collections.title(d));
+                        });
+                        binds.titleHigh.update();
+                        binds.titleHover.update();
+                        binds.lazyLoad.update();
+                        binds.aWindow.update();
+                    }
+                    if (data.title != null) {
+                        results.prepend(collections.collectionAdd());
+                    }
+                    if (data.remove != null) {
+                        results.prepend(collections.collectionRemove());
+                    }
                 }
             }
         },
@@ -608,9 +685,13 @@ $(function () {
                 },
                 favorite() {
                     return workers.metric.state() ? binds.sFavorite : false
+                },
+                collections() {
+                    return workers.metric.state() ? binds.sCollections : false
                 }
             },
             hoverMenu() {
+                let tile;
                 binds.titleHover.on('click', n => {
                     switch (Number(n)) {
                         case 0:
@@ -618,14 +699,17 @@ $(function () {
                         case 1:
                             return windows.open('title-info', tile)
                         case 2:
-                            return workers.favorite.toggle(tile)
+                            return windows.open('collections', { title: tile });
+                        case 3:
+                            return windows.open('collections', { remove: tile.id });
                         case 4:
                             return navigator.clipboard.writeText(tile.name)
                         case 5:
                             return window.open(shikimori.origin + tile.url)
                     }
-                }).on('open', e => {
-                    tile = JSON.parse(e.delegateTarget.dataset.add || "{}")
+                }).on('open', (e) => {
+                    const { add = '{}' } = e.delegateTarget.dataset;
+                    tile = JSON.parse(add);
                 });
             },
             schedule: {

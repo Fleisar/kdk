@@ -42,6 +42,10 @@
       "type": "html"
     },
     {
+      "url": "app/templates.html",
+      "type": "html"
+    },
+    {
       "url": "https://code.jquery.com/jquery-3.5.1.min.js",
       "type": "script"
     },
@@ -95,6 +99,10 @@
     },
     {
       "url": "app/anilibria.js",
+      "type": "script"
+    },
+    {
+      "url": "app/templates.js",
       "type": "script"
     },
     {

@@ -373,7 +373,7 @@ div.windows {
       &.console {
         background-color: #000;
       }
-      &.search .results, &.history .results, &.favorite .results {
+      &.search .results, &.history .results, &.favorite .results, &.collections .titles {
         text-align: center;
         .ui-title {
           margin: auto;
@@ -442,6 +442,9 @@ footer {
 
 // custom ui elements
 .ui {
+  &-adaptive {
+    display: none;
+  }
   // additions
   &-material-list {
     & {
@@ -844,6 +847,28 @@ footer {
     }
     &::after {
     }
+  }
+  &-alert {
+    background-color: rgb(var(--colorFill)) !important;
+    span {
+      color: rgb(var(--colorBackground));
+    }
+  }
+  &-breadcrumbs {
+    > * {
+      display: inline-block;
+      white-space: nowrap;
+
+      &:not(:last-child):after {
+        display: inline-block;
+        content: "/";
+        padding: 0.2em;
+      }
+    }
+  }
+  &-link {
+    text-decoration: underline;
+    cursor: pointer;
   }
 }
 .ui-hrefs a, a[href] {

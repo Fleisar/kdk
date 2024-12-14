@@ -306,10 +306,10 @@ div.windows > .main-window > div.window.search .search-box .search-input > input
 div.windows > .main-window > div.window.console {
   background-color: #000;
 }
-div.windows > .main-window > div.window.search .results, div.windows > .main-window > div.window.history .results, div.windows > .main-window > div.window.favorite .results {
+div.windows > .main-window > div.window.search .results, div.windows > .main-window > div.window.history .results, div.windows > .main-window > div.window.favorite .results, div.windows > .main-window > div.window.collections .titles {
   text-align: center;
 }
-div.windows > .main-window > div.window.search .results .ui-title, div.windows > .main-window > div.window.history .results .ui-title, div.windows > .main-window > div.window.favorite .results .ui-title {
+div.windows > .main-window > div.window.search .results .ui-title, div.windows > .main-window > div.window.history .results .ui-title, div.windows > .main-window > div.window.favorite .results .ui-title, div.windows > .main-window > div.window.collections .titles .ui-title {
   margin: auto;
 }
 div.windows > .main-window > div.window::-webkit-scrollbar {
@@ -367,6 +367,9 @@ footer {
   box-sizing: border-box;
 }
 
+.ui-adaptive {
+  display: none;
+}
 .ui-material-list {
   font-size: initial;
   background-color: rgb(var(--colorBackground));
@@ -745,6 +748,26 @@ footer {
   opacity: 0.5;
   border: var(--borderUI) solid rgb(var(--colorFill));
 }
+.ui-alert {
+  background-color: rgb(var(--colorFill)) !important;
+}
+.ui-alert span {
+  color: rgb(var(--colorBackground));
+}
+.ui-breadcrumbs > * {
+  display: inline-block;
+  white-space: nowrap;
+}
+.ui-breadcrumbs > *:not(:last-child):after {
+  display: inline-block;
+  content: "/";
+  padding: 0.2em;
+}
+.ui-link {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 .ui-hrefs a, a[href] {
   color: rgb(var(--colorHref));
   cursor: pointer;
