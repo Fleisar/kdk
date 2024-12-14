@@ -1,28 +1,85 @@
-(function(){
-    window.listStorage = function(name){
-        (this._list=localStorage.getItem(name))===null?(console.warn(`"${name}" list doesn't exist`),this._list=[]):this._list=JSON.parse(this._list)
-        this.name = name
-    }
-    window.listStorage.prototype = {
-        push(data){
-            let ind
-            if(data.id!==undefined&&(ind=this._list.map(d=>d.id).indexOf(data.id))!==-1)return this.delete(ind).push(data)
-            return this._list.push(data),this._save(),this
-        },
-        get(id){
-            if(id===undefined)return this._list
-            return this._list[id]
-        },
-        delete(id){
-            if(id===undefined)return this._list=[],this._save(),this
-            return delete this._list[id], this
-        },
-        modify(id,data){
-            if(id===undefined||typeof data !== 'object')throw 'Invalid type of inputs'
-            return this._list[id]=data,this._save(),this
-        },
-        _save(){
-            return localStorage.setItem(this.name,JSON.stringify(Object.values(this._list))),this
+/**
+ * @typedef {object & { id: string | number }} Data
+ * */
+
+class ListStorage {
+    /** @type {string} */
+    name;
+
+    /** @type {Map<string | number, Data>} */
+    #map = new Map();
+
+    /**
+     * @param name {string}
+     */
+    constructor(name) {
+        this.name = name;
+        if (name == null || typeof name !== 'string') {
+            throw new SyntaxError('name must be a string');
+        }
+
+        const rawList = localStorage.getItem(name);
+        if (rawList != null) {
+            let list = {};
+            try {
+                list = JSON.parse(rawList);
+            } catch (e) {
+                throw new SyntaxError(`Entry "${name}" corrupted. More description below:` + e);
+            }
+            this.#map = new Map(Object.entries(list));
         }
     }
-})()
+    /**
+     * @param data {Data}
+     */
+    push(data) {
+        if (!['number', 'string'].includes(typeof data.id)) {
+            throw new SyntaxError('data must include id type of string or number');
+        }
+        this.#map.set(data.id, data);
+        this.#save();
+    }
+    /**
+     * @param id {number | string}
+     * @return {boolean}
+     */
+    has(id) {
+        return this.#map.has(id.toString());
+    }
+    /**
+     * @param [id] {number | string}
+     * @return {Data[] | Data | undefined}
+     */
+    get(id) {
+        if (id == null) {
+            return Array.from(this.#map.values());
+        }
+
+        return this.#map.get(id.toString());
+    }
+    /**
+     * @param id {string | number}
+     * @param data {Data}
+     */
+    set(id, data) {
+        if (!this.#map.has(id.toString())) {
+            throw new SyntaxError(`entry with id "${id}" not found`);
+        }
+        this.#map.set(id.toString(), data);
+        this.#save();
+    }
+    /**
+     * @param id {string | number}
+     */
+    delete(id) {
+        this.#map.delete(id.toString());
+        this.#save();
+    }
+    #save() {
+        const list = Object.fromEntries(this.#map);
+        const rawList = JSON.stringify(list);
+        localStorage.setItem(this.name, rawList);
+    }
+}
+
+window.listStorage = ListStorage;

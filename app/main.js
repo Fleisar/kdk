@@ -466,13 +466,15 @@ $(function () {
                             this._data = r[0]
                             App.title(`KDK - ${this._data.russian || this._data.name}`)
                             $('.page.player .ui-bar').html(collections.playerBar(this._data))
-                            let hs = workers.metric.history()
-                            hs && hs.push({
-                                id: this._data.id,
-                                name: this._data.name,
-                                russian: this._data.russian,
-                                image: {preview: this._data.image.preview, original: this._data.image.original}
-                            })
+                            const history = workers.metric.history();
+                            if (history != null) {
+                                history.push({
+                                    id: this._data.id,
+                                    name: this._data.name,
+                                    russian: this._data.russian,
+                                    image: {preview: this._data.image.preview, original: this._data.image.original}
+                                })
+                            }
                             binds.aWindow.update()
                         })
                         $('.page.player .player-' + this._current).hide()
@@ -839,13 +841,21 @@ $(function () {
             kodik() {
                 binds.kodik.on('current_episode', d => {
                     pages.array.player._state = d
-                }).on('time_update', d => {
-                    let hs = workers.metric.history()
-                    if (!hs) return false
-                    let ls = hs.get(), ind = ls.map(e => e.id).indexOf(pages.array.player._data.id)
-                    if (ind === -1) return false
-                    ls.episodes[pages.array.player._state.episode] = d
-                    hs.modify(ind, ls[ind])
+                }).on('time_update', (data) => {
+                    let history = workers.metric.history();
+                    const { id } = pages.array.player._data;
+                    if (history == null || id == null) {
+                        return false;
+                    }
+
+                    const item = history.get(id);
+                    Object.assign(item, {
+                        episodes: {
+                            ...item.episodes ?? {},
+                            [pages.array.player._state.episode]: data,
+                        },
+                    });
+                    history.set(id, item);
                 })
 
             },
