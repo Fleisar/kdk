@@ -21,7 +21,7 @@
          * @param content {string} Should be limited by size limit (1000000 by default)
          * */
         createFile(name, content) {
-            const storageName = `${this._prefix}${this._storage.size}`;
+            const storageName = `${this._prefix}${this._storage.size}-${Date.now()}`;
 
             if (content.length > this._sizeLimit) {
                 throw `File content length must be less ${this._sizeLimit}`;
