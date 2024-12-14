@@ -160,6 +160,8 @@
                 return;
             }
 
+            this._storage = new Map(storageIndexes);
+
             if (this._selfCheck) {
                 const failed = this._checkIndexes();
 
@@ -169,8 +171,6 @@
                     })
                 }
             }
-
-            this._storage = new Map(storageIndexes);
         },
 
         /**
