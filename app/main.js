@@ -80,58 +80,26 @@ $(function () {
                 return `<a data-window="search" data-add='{"text":"${name}"}'><div class="ui-min-title" style="--from:'${from}'" title="Время: ${time}"><h4>${name}</h4></div></a>`
             },
             titleInfo(data) {
-                const dateOpts = { day: 'numeric', month: 'long', year: 'numeric' };
-                return `
-                    <div class="preview"></div>
-                    ${this.titleBase(data, '', {style: {margin: 'auto'}, classes: ['inactive']})}
-                    <h2 style="margin:auto" title="${data.name}">${data.russian || data.name} [${data.kind}]</h2>
-                    <hr/>
-                    <table class="ui-table-v">
-                        <tbody>
-                            <tr>
-                                <td>Статус</td>
-                                <td>${data.status || 'Неизвестно'}</td>
-                            </tr>
-                            <tr>
-                                <td>Рейтинг</td>
-                                <td>${data.score}</td>
-                            </tr>
-                            <tr>
-                                <td>Анонсирован</td>
-                                <td>${data.aired_on ? new Date(data.aired_on).toLocaleDateString(undefined, dateOpts) : 'Неизвестно'}</td>
-                            </tr>
-                            <tr>
-                                <td>Закончен</td>
-                                <td>${data.released_on? new Date(data.released_on).toLocaleDateString(undefined, dateOpts) : 'Неизвестно'}</td>
-                            </tr>
-                            <tr>
-                                <td>Оригинал</td>
-                                <td>${data.name}</td>
-                            </tr>
-                            <tr>
-                                <td>Эпизоды</td>
-                                <td>${data.episodes_aired}${data.episodes > 0 ? ` из ${data.episodes}` : ''}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <hr>
-                    <ui class="icon-list ui-material-list">
-                        <li onclick="window['KDK'].url.set('#player/shikimori/${data.id}',{})">Открыть</li>
-                        <li class="ui-disabled"><span class="material-icons icon">favorite</span>Любимое</li>
-                        <li class="ui-disabled"><span class="material-icons icon">gps_not_fixed</span>Отслеживать</li>
-                        <li onclick="window.open('${shikimori.origin}${data.url}')"><span class="icon">${shikimoriIcon}</span>Открыть в Shikimori</li>
-                    </ui>
-                    <hr>
-                    <h3>Хронология</h3>
-                    <ui class="ui-material-list timeline">
-                        ${collections.loadingResults()}
-                    </ui>
-                    <hr>
-                    <h3>Ссылки</h3>
-                    <ui class="ui-material-list icon-list links">
-                        ${collections.loadingResults()}
-                    </ui>
-                `
+                const formatDate = (dateString) => (
+                    new Date(dateString).toLocaleDateString(
+                        undefined,
+                        { day: 'numeric', month: 'long', year: 'numeric' },
+                    )
+                );
+                const template = new Template('template-title-info');
+                const payload = {
+                    ...data,
+                    titleCard: this.titleBase(data, '', {style: {margin: 'auto'}, classes: ['inactive']}),
+                    normalizedName: data.russian ?? data.name,
+                    status: data.status ?? 'Неизвестно',
+                    airedOn: data.aired_on != null ? formatDate(data.aired_on) : 'Неизвестно',
+                    releasedOn: data.released_on != null ? formatDate(data.released_on) : 'Неизвестно',
+                    normalizedEpisodes: `${data.episodes_aired}${data.episodes > 0 ? ` из ${data.episodes}` : ''}`,
+                    collectionAdd: {title: data},
+                    collectionRemove: {remove: data.id},
+                    openInShikimori: `${shikimori.origin}${data.url}`,
+                }
+                return template.clone(payload);
             },
             loadingResults() {
                 return '<div class="ui-load"><span class="material-icons">hourglass_empty</span></div>'
@@ -203,6 +171,8 @@ $(function () {
                     return body.css('--colorFill', toRGB(v).join(', '))
                 case 'colorHref':
                     return body.css('--colorHref', toRGB(v).join(', '))
+                case 'colorAttention':
+                    return body.css('--colorAttention', toRGB(v).join(', '))
                 case 'highEffects':
                     return body.attr('highEffects', v.toString())
                 case 'playerMode':
@@ -602,11 +572,6 @@ $(function () {
                     })
                 }, 'jq.custom')
                 pages.init()
-                $('body').contextmenu(e => {
-                    if (windows.current !== null) windows.close()
-                    else pages.set('general')
-                    e.preventDefault()
-                })
                 binds.aPage.bind(function () {
                     pages.set($(this).attr('data-page'))
                 }, 'jq.custom')
