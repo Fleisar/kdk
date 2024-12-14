@@ -35,6 +35,8 @@
             const startInstalling = Date.now();
             const manifest = await fetch(manifestName).then((r) => r.json());
 
+            DOM.loadScreen.root().classList.remove('fade');
+
             if (manifest == null) {
                 throw 'Error white fetching manifest';
             }
@@ -87,22 +89,29 @@
          */
         async _downloadAppSource(sources) {
             for (let i = 0; i < sources.length; i += 1) {
-                const { url } = sources[i];
-                const content = await fetch(url)
-                    .then((r) => {
-                        if (!r.ok) {
-                            return null;
-                        }
-                        return r.text();
-                    });
-
-                if (content == null) {
-                    throw `Error while fetching source file "${url}"`;
-                }
-
-                storage.createFile(url, content);
+                await this._downloadSource(sources[i]);
                 this.progress(i + 1, sources.length);
             }
+        },
+
+        /**
+         * Download source file and store it
+         * @param source {{ url: string, type: string }}
+         */
+        async _downloadSource(source) {
+            const { url } = source;
+            const content = await fetch(url)
+                .then((r) => {
+                    if (!r.ok) {
+                        return null;
+                    }
+                    return r.text();
+                });
+
+            if (content == null) {
+                throw `Error while fetching source file "${url}"`;
+            }
+            storage.createFile(url, content);
         },
 
         /**
@@ -127,10 +136,17 @@
          * Run installed app
          * @param install
          */
-        run(install = false) {
-            this.info.sources.forEach((source) => {
-                storage.prepareDOMNode(source.url, source.type);
-            });
+        async run(install = false) {
+            for (const source of this.info.sources) {
+                try {
+                    storage.prepareDOMNode(source.url, source.type);
+                } catch (e) {
+                    if (e instanceof ReferenceError) {
+                        await this._downloadSource(source);
+                        storage.prepareDOMNode(source.url, source.type);
+                    }
+                }
+            }
 
             readyDOM(() => {
                 const meta = [];

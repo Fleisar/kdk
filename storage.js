@@ -9,7 +9,7 @@
         _sizeLimit: 1e6,
         _selfCheck: true,
         _autoSave: true,
-        _canOverwrite: false,
+        _canOverwrite: true,
         _saveTimeout: 5e3,
 
         _storage: new Map(),
@@ -80,7 +80,7 @@
             const content = localStorage.getItem(storageName);
 
             if (this._selfCheck && content == null) {
-                throw `Error while reading "${name}" from storage`;
+                throw new ReferenceError(`Error while reading "${name}" from storage`);
             }
 
             return content;
