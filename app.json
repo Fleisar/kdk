@@ -1,19 +1,18 @@
 {
-  "devMode": true,
   "shortName": "KDK",
   "name": "KDK Anime",
-  "logo": "app/logo.svg",
-  "icon": ["app/logo.png","image/png"],
+  "logo": "app/assets/logo.svg",
+  "icon": ["app/assets/logo.png","image/png"],
   "application": {
     "name": "KDK",
     "manifest": "app/manifest.json"
   },
   "loadType": "self",
   "update": {
-    "release": 103,
+    "release": 104,
     "type": "release",
-    "version": "3.1 stable",
-    "description": "ilkuyahiw7846hyrnoqiw383674rnhaop9wm8uy37fmn0paows8e3yurt09npawm834f,uapw8u"
+    "version": "3.2 stable",
+    "description": "Добавлены коллекции. Создавайте собственные коллекции, добавляйте и категоризируйте тайтлы."
   },
   "update_policy": "auto",
   "sources": [
