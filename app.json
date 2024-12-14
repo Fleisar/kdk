@@ -50,7 +50,7 @@
       "type": "script"
     },
     {
-      "url": "app/bind.addon.js",
+      "url": "app/libs/bind.addon.js",
       "type": "script"
     },
     {
@@ -62,47 +62,47 @@
       "type": "script"
     },
     {
-      "url": "app/hovermenu.js",
+      "url": "app/libs/hovermenu.js",
       "type": "script"
     },
     {
-      "url": "app/listStorage.js",
+      "url": "app/libs/listStorage.js",
       "type": "script"
     },
     {
-      "url": "app/configCollector.js",
+      "url": "app/libs/configCollector.js",
       "type": "script"
     },
     {
-      "url": "app/uri.js",
+      "url": "app/libs/uri.js",
       "type": "script"
     },
     {
-      "url": "app/animevost.js",
+      "url": "app/libs/animevost.js",
       "type": "script"
     },
     {
-      "url": "app/kodik.js",
+      "url": "app/libs/kodik.js",
       "type": "script"
     },
     {
-      "url": "app/kodik.backend.js",
+      "url": "app/libs/kodik.backend.js",
       "type": "script"
     },
     {
-      "url": "app/shikimori.js",
+      "url": "app/libs/shikimori.js",
       "type": "script"
     },
     {
-      "url": "app/animetop.js",
+      "url": "app/libs/animetop.js",
       "type": "script"
     },
     {
-      "url": "app/anilibria.js",
+      "url": "app/libs/anilibria.js",
       "type": "script"
     },
     {
-      "url": "app/templates.js",
+      "url": "app/libs/templates.js",
       "type": "script"
     },
     {
