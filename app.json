@@ -9,7 +9,7 @@
   },
   "loadType": "self",
   "update": {
-    "release": 106,
+    "release": 107,
     "type": "release",
     "version": "3.2 stable",
     "description": "Добавлены коллекции. Создавайте собственные коллекции, добавляйте и категоризируйте тайтлы."
@@ -102,6 +102,10 @@
     },
     {
       "url": "app/libs/templates.js",
+      "type": "script"
+    },
+    {
+      "url": "app/modules/ContainerManager.js",
       "type": "script"
     },
     {

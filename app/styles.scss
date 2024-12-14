@@ -167,11 +167,19 @@ header {
         overflow: hidden;
         transition: 0.2s background-color;
       }
+
+      &.active[data-page] {
+        pointer-events: none;
+      }
+
       &:not([disabled]) {
         cursor: pointer;
-        &:hover {
+        &:hover, &.active {
           background-color: rgba(var(--colorHeaderHover),0.1);
           box-shadow: inset 0 0 0 2px rgba(var(--colorHeaderHover),0.1);
+
+        }
+        &:not(.active[data-page]):hover {
           &:before {
             opacity: 1;
           }
@@ -204,6 +212,7 @@ header {
 
 div.page {
   & {
+    display: none;
     font-size: medium;
     width: var(--pageWidth);
     height: var(--pageHeight);
@@ -211,6 +220,9 @@ div.page {
     overflow: hidden;
     overflow-y: auto;
     background-color: rgb(var(--colorBackground));
+  }
+  &.active {
+    display: block !important;
   }
   &.general {
     & > div.container {
