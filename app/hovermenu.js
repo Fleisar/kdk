@@ -30,7 +30,14 @@
         },
         update(){
             return $(this.selector).unbind('contextmenu').on('contextmenu',e=>{
-                this.open(e.pageX,e.pageY)
+                const menuWidth = this.ROOT.width();
+                const menuHeight = this.ROOT.height();
+                const pageWidth = $(document).width();
+                const pageHeight = $(document).height();
+                this.open(
+                    Math.min(e.pageX, pageWidth - menuWidth - 16),
+                    Math.min(e.pageY, pageHeight - menuHeight - 16),
+                );
                 this._call(this._keeper.open,[e])
                 return e.preventDefault(), false
             }), this
@@ -56,7 +63,7 @@
             if(typeof menu !== 'object') throw 'Invalid type of menu'
             this.ROOT.html('')
             Object.values(menu).forEach((i,n)=>{
-                if(typeof i === 'string') return this.ROOT.append(`<li data-id="${n}">${i}</li>`)
+                if(typeof i === 'string') return this.ROOT.append(`<li data-id="${n}">${i}</li>`);
                 this.ROOT.append(`<li data-id="${n}">${i.text}</li>`)
                 let selector = this.ROOT.children(`li[data-id=${n}]`)
                 i.action&&selector.attr('stay','')
