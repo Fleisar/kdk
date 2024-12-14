@@ -191,7 +191,7 @@ $(function () {
                     let data = JSON.parse(e.delegateTarget.dataset.add || "null")
                         , name = e.delegateTarget.dataset.window
                     if (name === this.current && this.container && data == null) return this.close()
-                    return this.open(name, data)
+                    return this.open(name, data ?? {})
                 }, 'windows.bind')
                 $('.windows').click(e => {
                     if (e.target.classList.contains('windows'))
