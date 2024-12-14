@@ -1,0 +1,22 @@
+{
+  "name": "kdk",
+  "version": "1.0.0",
+  "description": "KDK Anime",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Fleisar/kdk.git"
+  },
+  "author": "Matvey Kuznetsov <me@fle.su>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Fleisar/kdk/issues"
+  },
+  "homepage": "https://github.com/Fleisar/kdk#readme",
+  "devDependencies": {
+    "sass": "^1.82.0"
+  }
+}
