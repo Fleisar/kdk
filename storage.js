@@ -11,6 +11,7 @@
         _autoSave: true,
         _canOverwrite: true,
         _saveTimeout: 5e3,
+        _deleteCorrupted: true,
 
         _storage: new Map(),
         _saveQueue: null,
@@ -159,6 +160,16 @@
                 return;
             }
 
+            if (this._selfCheck) {
+                const failed = this._checkIndexes();
+
+                if (this._deleteCorrupted) {
+                    failed.forEach((file) => {
+                        this.deleteFile(file);
+                    })
+                }
+            }
+
             this._storage = new Map(storageIndexes);
         },
 
@@ -195,10 +206,12 @@
          */
         _checkIndexes() {
             const failed = [];
+            const listed = new Set();
             for (const [name, storageName] of this._storage.entries()) {
-                if (localStorage.getItem(storageName) == null) {
+                if (localStorage.getItem(storageName) == null || listed.has(storageName)) {
                     failed.push(name);
                 }
+                listed.add(storageName);
             }
 
             return failed;
