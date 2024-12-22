@@ -186,19 +186,19 @@ $(function () {
     const windowManager = new ContainerManager('.windows');
     const windows = {
         bind() {
-            binds.aWindow.bind(e => {
-                let data = JSON.parse(e.delegateTarget.dataset.add || "null")
-                    , name = e.delegateTarget.dataset.window
-                console.log({ name, data });
+            binds.aWindow.bind((e) => {
+                const name = e.delegateTarget.dataset.window;
+                const data = JSON.parse(e.delegateTarget.dataset.add || "null");
                 if (windowManager.currentContainer === name && data == null) {
                     return windowManager.close();
                 }
-                return windowManager.open(name, data)
-            }, 'windows.bind')
-            $('.windows').click(e => {
-                if (e.target.classList.contains('windows'))
-                    windowManager.close()
-            })
+                return windowManager.open(name, data);
+            }, 'windows.bind');
+            $('.windows').on('clink', (e) => {
+                if (e.target.classList.contains('windows')) {
+                    windowManager.close();
+                }
+            });
         },
         array: {
             config: () => {
@@ -207,8 +207,6 @@ $(function () {
             },
             'title-info': title => {
                 $('.windows .window.title-info .ui-grid').html(collections.titleInfo(title))
-                binds.lazyLoad.update()
-                binds.titleHigh.update()
                 let timeline = $('.window.title-info .ui-material-list.timeline'),
                     links = $('.window.title-info .ui-material-list.links')
                 shikimori.anime(title.id).franchise().then(r => {
@@ -229,6 +227,8 @@ $(function () {
                         links.append(collections.materialItem(`<span class="icon"><img src="${shikimori.origin}/assets/blocks/b-external_links/${kind ? l.kind : "official_site"}.png" alt="${kind || "official_site"}" height="100%"></span>${kind || l.kind}`, {href: l.url}))
                     })
                 })
+                binds.lazyLoad.update()
+                binds.titleHigh.update()
                 binds.aWindow.update();
             },
             search: data => {
@@ -600,11 +600,11 @@ $(function () {
                     case 0:
                         return url.set('#player/shikimori/' + tile.id, {})
                     case 1:
-                        return windows.open('title-info', tile)
+                        return windowManager.open('title-info', tile)
                     case 2:
-                        return windows.open('collections', { title: tile });
+                        return windowManager.open('collections', { title: tile });
                     case 3:
-                        return windows.open('collections', { remove: tile.id });
+                        return windowManager.open('collections', { remove: tile.id });
                     case 4:
                         return navigator.clipboard.writeText(tile.name)
                     case 5:
