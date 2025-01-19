@@ -1,3 +1,8 @@
+/* global
+    $, URI, Bind, LazyLoad, configCollector, Anilibria, kodik, kodikBackend, hotkeys
+    shikimori, Template, ContainerManager, App, ListStorage, ContainerManager, HoverMenu
+*/
+
 const shikimoriIcon = `
     <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 104.5 104.5" preserveAspectRatio="xMidYMid meet">
         <g transform="matrix(0.012775 0 0 0.012775 -15.304452 -9.893285)">
@@ -9,8 +14,8 @@ const shikimoriIcon = `
     </svg>
 `;
 
-$(function () {
-    const {readyDOM} = window.utils;
+$(() => {
+    const { readyDOM } = window.utils;
     const defaultConfig = {
         showHistory: true,
         realtimeSearch: true,
@@ -23,7 +28,7 @@ $(function () {
         hover: new Bind('header a', 'mousemove'),
         bodyScroll: new Bind('.page.general', 'scroll'),
         lazyLoad: new LazyLoad({}),
-        titleHover: new hoverMenu('.ui-title', [
+        titleHover: new HoverMenu('.ui-title', [
             'Открыть',
             '<span class="material-icons icon">info</span>Информация',
             '<span class="material-icons icon">playlist_add</span>Добавить в коллекцию',
@@ -31,53 +36,53 @@ $(function () {
             '<span class="material-icons icon">content_copy</span>Скопировать название',
             {
                 text: `<span class="icon">${shikimoriIcon}</span>Открыть в Shikimori`,
-                classes: ['externalLink']
-            }
-        ], {classes: ['icon-list', 'ui-hovermenu', 'ui-material-list']}),
-        config: new configCollector({config: defaultConfig}),
+                classes: ['externalLink'],
+            },
+        ], { classes: ['icon-list', 'ui-hovermenu', 'ui-material-list'] }),
+        config: new configCollector({ config: defaultConfig }),
         anilibria: new Anilibria(),
         kodik: new kodik('.page.player .player-kodik'),
         kodikBackend: new kodikBackend('07e3119af111900bf95bd7c9554430a4'),
-        sHistory: new listStorage('sHistory'),
-        sFavorite: new listStorage('sFavorite'),
-        sCollections: new listStorage('sCollections'),
-        titleHigh: new Bind('.ui-title', 'mousemove')
+        sHistory: new ListStorage('sHistory'),
+        sFavorite: new ListStorage('sFavorite'),
+        sCollections: new ListStorage('sCollections'),
+        titleHigh: new Bind('.ui-title', 'mousemove'),
     };
-    const toRGB = function (hex) {
-        let hex_code = hex.split(""),
-            red = parseInt(hex_code[1] + hex_code[2], 16),
-            green = parseInt(hex_code[3] + hex_code[4], 16),
-            blue = parseInt(hex_code[5] + hex_code[6], 16)
+    const toRGB = (hex) => {
+        const hexCode = hex.split('');
+        const red = parseInt(hexCode[1] + hexCode[2], 16);
+        const green = parseInt(hexCode[3] + hexCode[4], 16);
+        const blue = parseInt(hexCode[5] + hexCode[6], 16);
         return [red, green, blue];
     };
     const collections = {
         title(data, inner = this.titleBase) {
-            return `<a data-page="player" href="#player/shikimori/${data.id}" title="${(data.russian ? data.russian + '\n' : '') + data.name}">${inner(data)}</a>`
+            return `<a data-page="player" href="#player/shikimori/${data.id}" title="${(data.russian ? `${data.russian}\n` : '') + data.name}">${inner(data)}</a>`;
         },
         titleBase(data, bottom, options = {}) {
             return `
-                <div class="ui-title${options.classes ? ` ${options.classes.join(' ')}` : ''}" data-add='${JSON.stringify(data)}' ${options.style ? `style="${Object.keys(options.style).map(k => k + ':' + options.style[k]).join(';')}"` : ''}>
+                <div class="ui-title${options.classes ? ` ${options.classes.join(' ')}` : ''}" data-add='${JSON.stringify(data)}' ${options.style ? `style="${Object.keys(options.style).map((k) => `${k}:${options.style[k]}`).join(';')}"` : ''}>
                     <div class="preview">
                         <div class="lazy backdrop" data-bg="${shikimori.origin}${data.image.preview}"></div>
                         <div class="lazy" data-bg="${shikimori.origin}${binds.config.config.highPreview ? data.image.original || data.image.preview : data.image.preview}"></div>
                     </div>
-                    <div>${bottom || ""}</div>
+                    <div>${bottom || ''}</div>
                 </div>
-            `
+            `;
         },
         titleExtended(data, bottom, options = {}) {
             return `
-                <div class="ui-title${options.classes ? ` ${options.classes.join(' ')}` : ''}" data-add='${JSON.stringify(data)}' ${options.style ? `style="${Object.keys(options.style).map(k => k + ':' + options.style[k]).join(';')}"` : ''}>
+                <div class="ui-title${options.classes ? ` ${options.classes.join(' ')}` : ''}" data-add='${JSON.stringify(data)}' ${options.style ? `style="${Object.keys(options.style).map((k) => `${k}:${options.style[k]}`).join(';')}"` : ''}>
                     <div class="preview">
                         <div class="lazy backdrop" data-bg="${shikimori.origin}${data.image.preview}"></div>
                         <div class="lazy" data-bg="${shikimori.origin}${binds.config.config.highPreview ? data.image.original || data.image.preview : data.image.preview}"></div>
                     </div>
-                    <div>${bottom || ""}</div>
+                    <div>${bottom || ''}</div>
                 </div>
-            `
+            `;
         },
         minTitle(name, time, from) {
-            return `<a data-window="search" data-add='{"text":"${name}"}'><div class="ui-min-title" style="--from:'${from}'" title="Время: ${time}"><h4>${name}</h4></div></a>`
+            return `<a data-window="search" data-add='{"text":"${name}"}'><div class="ui-min-title" style="--from:'${from}'" title="Время: ${time}"><h4>${name}</h4></div></a>`;
         },
         titleInfo(data) {
             const formatDate = (dateString) => (
@@ -89,46 +94,51 @@ $(function () {
             const template = new Template('template-title-info');
             const payload = {
                 ...data,
-                titleCard: this.titleBase(data, '', {style: {margin: 'auto'}, classes: ['inactive']}),
-                normalizedName: data.russian ?? data.name,
-                status: data.status ?? 'Неизвестно',
+                titleCard: this.titleBase(data, '', { style: { margin: 'auto' }, classes: ['inactive'] }),
+                normalizedName: data.russian || data.name,
+                status: data.status || 'Неизвестно',
                 airedOn: data.aired_on != null ? formatDate(data.aired_on) : 'Неизвестно',
                 releasedOn: data.released_on != null ? formatDate(data.released_on) : 'Неизвестно',
                 normalizedEpisodes: `${data.episodes_aired}${data.episodes > 0 ? ` из ${data.episodes}` : ''}`,
-                collectionAdd: {title: data},
-                collectionRemove: {remove: data.id},
+                collectionAdd: { title: data },
+                collectionRemove: { remove: data.id },
                 openInShikimori: `${shikimori.origin}${data.url}`,
-            }
+            };
             return template.clone(payload);
         },
         loadingResults() {
-            return '<div class="ui-load"><span class="material-icons">hourglass_empty</span></div>'
+            return '<div class="ui-load"><span class="material-icons">hourglass_empty</span></div>';
         },
         noResults(text = 'Не удалось ничего найти') {
-            return '<div class="ui-error"><div><span class="material-icons">announcement</span><h5>' + text + '</h5></div></div>'
+            return `<div class="ui-error"><div><span class="material-icons">announcement</span><h5>${text}</h5></div></div>`;
         },
         progress(statistic, digits = 2) {
-            let data = statistic[1], progress = [],
-                precent = 360 / Object.keys(data).filter(k => data[k].size !== '0B' ? k : null).length,
-                description = []
-            Object.keys(data).filter(k => data[k].size !== '0B' ? k : null).forEach((k, i) => {
-                let precents = Math.ceil(data[k].part * 10 ** (digits + 2)) / 10 ** digits
-                progress.push(`<div title="${k} - ${precents}%" style="--color:${data[k].color || precent * i}deg;--part:${data[k].part}"></div>`)
-                description.push(`<div style="--color:${data[k].color || precent * i}deg" title="${precents}%" class="ui-progress-part">${data[k].description || k} (${data[k].size})</div>`)
-            })
-            return `<span>Всего: ${statistic[0]}</span><div class="ui-progress">${progress.join('')}</div>${description.join('')}`
+            const data = statistic[1]; const progress = [];
+            const precent = 360 / Object.keys(data).filter((k) => (data[k].size !== '0B' ? k : null)).length;
+            const description = [];
+            Object.keys(data).filter((k) => (data[k].size !== '0B' ? k : null)).forEach((k, i) => {
+                const precents = Math.ceil(data[k].part * 10 ** (digits + 2)) / 10 ** digits;
+                progress.push(`<div title="${k} - ${precents}%" style="--color:${data[k].color || precent * i}deg;--part:${data[k].part}"></div>`);
+                description.push(`<div style="--color:${data[k].color || precent * i}deg" title="${precents}%" class="ui-progress-part">${data[k].description || k} (${data[k].size})</div>`);
+            });
+            return `<span>Всего: ${statistic[0]}</span><div class="ui-progress">${progress.join('')}</div>${description.join('')}`;
         },
         playerBar(data) {
-            return `<a class="material-icons" data-window="title-info" data-add='${JSON.stringify(data)}' title="Информация">info</a><span>${data.russian || data.name}</span>`
+            const template = new Template('template-player-bar');
+            const payload = {
+                data: JSON.stringify(data),
+                name: data.russian || data.name,
+            };
+            return template.clone(payload);
         },
         materialItem(text, data) {
-            return `${data.window || data.page || data.href ? `<a ${data.data || data.href ? ` href="${data.data || data.href}"` : ''} ${data.href ? 'target="_blank"' : ''} ${data.page ? `data-page='${data.page}'` : ''} ${data.window ? `data-window='${data.window}'${data.data ? ` data-add="${data.data}"` : ''}` : ''}>` : ''}<li ${data.active ? 'class="active"' : ''}>${text}</li>${data.window || data.page || data.href ? `</a>` : ''}`
+            return `${data.window || data.page || data.href ? `<a ${data.data || data.href ? ` href="${data.data || data.href}"` : ''} ${data.href ? 'target="_blank"' : ''} ${data.page ? `data-page='${data.page}'` : ''} ${data.window ? `data-window='${data.window}'${data.data ? ` data-add="${data.data}"` : ''}` : ''}>` : ''}<li ${data.active ? 'class="active"' : ''}>${text}</li>${data.window || data.page || data.href ? '</a>' : ''}`;
         },
         consoleRow(text, color) {
-            return `<pre style="color:${color};margin:0">${text}</pre>`
+            return `<pre style="color:${color};margin:0">${text}</pre>`;
         },
         filterItem(name, title, options) {
-            return `<div class="ui-select"><span>${title}</span><select name="${name}">${Object.values(options).map(i => `<option value="${i.value}" ${i.selected ? 'selected' : ''}>${i.name}</option>`).join('')}</select><i class="material-icons">expand_more</i></div>`
+            return `<div class="ui-select"><span>${title}</span><select name="${name}">${Object.values(options).map((i) => `<option value="${i.value}" ${i.selected ? 'selected' : ''}>${i.name}</option>`).join('')}</select><i class="material-icons">expand_more</i></div>`;
         },
         collection(name, data) {
             const template = new Template('template-collection');
@@ -145,42 +155,89 @@ $(function () {
         collectionRemove() {
             const template = new Template('template-collection-alert');
             return template.clone({ text: 'Чтобы удалить тайтл из коллекции, выберите её в списке ниже' });
-        }
+        },
     };
     const config = (k, v) => {
-        let body = $('body'),
-            kodik = $('.page.player .player-kodik.player')
+        const body = $('body');
+        const kodik = $('.page.player .player-kodik.player');
         switch (k) {
-            case 'disableAnimations':
-                return body.attr('disableAnimations', v.toString())
-            case 'showTime':
-                return $('.ui-clock').attr('display', v.toString());
-            case 'showReleases':
-                return $('header [data-window=releases]').attr('display', v.toString())
-            case 'showCollection':
-                return $('header [data-window=collections]').attr('display', v.toString())
-            case 'showHistory':
-                return $('header [data-window=history]').attr('display', v.toString())
-            case 'showFavorite':
-                return $('header [data-window=favorite]').attr('display', v.toString())
-            case 'colorBG':
-                return body.css('--colorBackground', toRGB(v).join(', '))
-            case 'colorText':
-                return body.css('--colorText', toRGB(v).join(', '))
-            case 'colorFill':
-                return body.css('--colorFill', toRGB(v).join(', '))
-            case 'colorHref':
-                return body.css('--colorHref', toRGB(v).join(', '))
-            case 'colorAttention':
-                return body.css('--colorAttention', toRGB(v).join(', '))
-            case 'highEffects':
-                return body.attr('highEffects', v.toString())
-            case 'playerMode':
-                return $('div.page.player, div.window.config div.player-preview').attr('playerMode', v)
-            case 'showTracking':
-                return $('header [data-window=tracking]').attr('display', v.toString())
-            case 'disableAds':
-                return v ? kodik.attr('sandbox', 'allow-same-origin allow-scripts') : kodik.removeAttr('sandbox')
+        case 'disableAnimations': {
+            body.attr('disableAnimations', v.toString());
+            break;
+        }
+        case 'showTime': {
+            $('.ui-clock')
+                .attr('display', v.toString());
+            break;
+        }
+        case 'showReleases': {
+            $('header [data-window=releases]')
+                .attr('display', v.toString());
+            break;
+        }
+        case 'showCollection': {
+            $('header [data-window=collections]')
+                .attr('display', v.toString());
+            break;
+        }
+        case 'showHistory': {
+            $('header [data-window=history]')
+                .attr('display', v.toString());
+            break;
+        }
+        case 'showFavorite': {
+            $('header [data-window=favorite]')
+                .attr('display', v.toString());
+            break;
+        }
+        case 'colorBG': {
+            body.css('--colorBackground', toRGB(v)
+                .join(', '));
+            break;
+        }
+        case 'colorText': {
+            body.css('--colorText', toRGB(v)
+                .join(', '));
+            break;
+        }
+        case 'colorFill': {
+            body.css('--colorFill', toRGB(v)
+                .join(', '));
+            break;
+        }
+        case 'colorHref': {
+            body.css('--colorHref', toRGB(v)
+                .join(', '));
+            break;
+        }
+        case 'colorAttention': {
+            body.css('--colorAttention', toRGB(v)
+                .join(', '));
+            break;
+        }
+        case 'highEffects': {
+            body.attr('highEffects', v.toString());
+            break;
+        }
+        case 'playerMode': {
+            $('div.page.player, div.window.config div.player-preview')
+                .attr('playerMode', v);
+            break;
+        }
+        case 'showTracking': {
+            $('header [data-window=tracking]')
+                .attr('display', v.toString());
+            break;
+        }
+        case 'disableAds': {
+            if (v) {
+                kodik.attr('sandbox', 'allow-same-origin allow-scripts');
+            } else {
+                kodik.removeAttr('sandbox');
+            }
+            break;
+        }
+        default: break;
         }
     };
     const windowManager = new ContainerManager('.windows');
@@ -188,13 +245,13 @@ $(function () {
         bind() {
             binds.aWindow.bind((e) => {
                 const name = e.delegateTarget.dataset.window;
-                const data = JSON.parse(e.delegateTarget.dataset.add || "null");
+                const data = JSON.parse(e.delegateTarget.dataset.add || 'null');
                 if (windowManager.currentContainer === name && data == null) {
                     return windowManager.close();
                 }
                 return windowManager.open(name, data);
             }, 'windows.bind');
-            $('.windows').on('clink', (e) => {
+            $('.windows').on('click', (e) => {
                 if (e.target.classList.contains('windows')) {
                     windowManager.close();
                 }
@@ -202,55 +259,71 @@ $(function () {
         },
         array: {
             config: () => {
-                $('.window.config .version').text(`[${App.info.short_name}]${App.info.update.version}(rel:${App.info.update.release})`)
-                $('.window.config .storage').html(collections.progress(workers.storage._data()))
+                $('.window.config .version').text(`[${App.info.short_name}]${App.info.update.version}(rel:${App.info.update.release})`);
+                $('.window.config .storage').html(collections.progress(workers.storage._data()));
             },
-            'title-info': title => {
-                $('.windows .window.title-info .ui-grid').html(collections.titleInfo(title))
-                let timeline = $('.window.title-info .ui-material-list.timeline'),
-                    links = $('.window.title-info .ui-material-list.links')
-                shikimori.anime(title.id).franchise().then(r => {
-                    timeline.html('')
-                    r.nodes.forEach(n => {
+            'title-info': (title) => {
+                $('.windows .window.title-info .ui-grid').html(collections.titleInfo(title));
+                const timeline = $('.window.title-info .ui-material-list.timeline');
+                const links = $('.window.title-info .ui-material-list.links');
+                shikimori.anime(title.id).franchise().then((r) => {
+                    timeline.html('');
+                    r.nodes.forEach((n) => {
                         timeline.append(collections.materialItem(n.name, {
                             page: 'player',
                             data: `#player/shikimori/${n.id}`,
-                            active: n.id === title.id
-                        }))
-                    })
-                    binds.aPage.update()
-                })
-                shikimori.anime(title.id).external_links().then(r => {
-                    links.html('')
-                    r.forEach(l => {
-                        let kind = workers.shikimori.linkTitle(l.kind)
-                        links.append(collections.materialItem(`<span class="icon"><img src="${shikimori.origin}/assets/blocks/b-external_links/${kind ? l.kind : "official_site"}.png" alt="${kind || "official_site"}" height="100%"></span>${kind || l.kind}`, {href: l.url}))
-                    })
-                })
-                binds.lazyLoad.update()
-                binds.titleHigh.update()
+                            active: n.id === title.id,
+                        }));
+                    });
+                    binds.aPage.update();
+                });
+                shikimori.anime(title.id).external_links().then((r) => {
+                    links.html('');
+                    r.forEach((l) => {
+                        const kind = workers.shikimori.linkTitle(l.kind);
+                        links.append(collections.materialItem(`<span class="icon"><img src="${shikimori.origin}/assets/blocks/b-external_links/${kind ? l.kind : 'official_site'}.png" alt="${kind || 'official_site'}" height="100%"></span>${kind || l.kind}`, { href: l.url }));
+                    });
+                });
+                binds.lazyLoad.update();
+                binds.titleHigh.update();
                 binds.aWindow.update();
             },
-            search: data => {
+            search: (data) => {
+                const searchDebounceTime = 1e3 / 4;
+                let searchInputDebounce = null;
                 if (data != null && data.text) {
-                    $('.window.search input[type=text]').val(data.text)
-                    workers.search.search(data.text)
+                    $('.window.search input[type=text]').val(data.text);
+                    workers.search.search(data.text);
                 }
-                $('.window.search .search-input>input[type=text]').focus().unbind('keypress').keypress(e => {
-                    let search = $('.window.search input[type=text]')
-                    if (e.key === 'Enter' || (search.val().length >= 2 && binds.config.config.realtimeSearch)) workers.search.search(search.val())
-                })
+                $('.window.search .search-input>input[type=text]').focus().unbind('input').on('input', (e) => {
+                    const search = $('.window.search input[type=text]').val();
+                    if (e.key === 'Enter') {
+                        workers.search.search(search);
+                        clearTimeout(searchInputDebounce);
+                    }
+
+                    if (
+                        search.length >= 2
+                        && binds.config.config.realtimeSearch
+                    ) {
+                        clearTimeout(searchInputDebounce);
+                        searchInputDebounce = setTimeout(() => {
+                            workers.search.search(search);
+                        }, searchDebounceTime);
+                    }
+                });
                 $('.window.search .search-input>button').unbind('click').click(() => {
-                    workers.search.search($('.window.search input[type=text]').val())
-                })
+                    workers.search.search($('.window.search input[type=text]').val());
+                });
             },
             history() {
-                let results = $('.window.history .results'), hs = workers.metric.history()
-                results.html('')
-                if (hs === false) return results.html(collections.noResults('Сбор данных отключён'))
-                Object.values(hs.get()).reverse().forEach(d => results.append(collections.title(d)))
-                binds.titleHigh.update()
-                binds.lazyLoad.update()
+                const results = $('.window.history .results'); const
+                    hs = workers.metric.history();
+                results.html('');
+                if (hs === false) return results.html(collections.noResults('Сбор данных отключён'));
+                Object.values(hs.get()).reverse().forEach((d) => results.append(collections.title(d)));
+                binds.titleHigh.update();
+                binds.lazyLoad.update();
             },
             collections(data) {
                 const results = $('.window.collections .result').html('');
@@ -264,8 +337,7 @@ $(function () {
                     const list = cll.get().reverse();
                     results.html(list.length > 0
                         ? ''
-                        : collections.noResults('Пока тут пусто')
-                    );
+                        : collections.noResults('Пока тут пусто'));
 
                     list.forEach((d) => results.append(
                         collections.collection(d.name, {
@@ -276,7 +348,7 @@ $(function () {
                         }),
                     ));
                     binds.aWindow.update();
-                }
+                };
                 renderList();
 
                 if (data == null) {
@@ -306,7 +378,7 @@ $(function () {
                         titleList.append(collections.title(d));
                     });
                     binds.titleHigh.update();
-                    binds.titleHover.update();
+                    binds.titleHover.updateSelector();
                     binds.lazyLoad.update();
                     binds.aWindow.update();
                 }
@@ -316,12 +388,15 @@ $(function () {
                 if (data.remove != null) {
                     results.prepend(collections.collectionRemove());
                 }
-            }
-        }
+            },
+        },
     };
-    Object.entries(windows.array).forEach(([windowName, callback]) => {
+    Object.entries(windows.array).forEach(([windowName]) => {
         windowManager.register(windowName, `.window.${windowName}`);
         windowManager.addEventListener(windowName, 'open', windows.array[windowName]);
+    });
+    ['info-usage', 'info-processing', 'about', 'tutorial'].forEach((windowName) => {
+        windowManager.register(windowName, `.window.${windowName}`);
     });
     $('header nav > a[data-window]').each((_, element) => {
         const name = $(element).data('window');
@@ -338,26 +413,26 @@ $(function () {
         _current: 'general',
         levels: [],
         init() {
-            return this.processor()
+            return this.processor();
         },
         bind() {
-            binds.aPage.bind(e => {
-                let data = JSON.parse(e.delegateTarget.dataset.add || "null")
-                    , name = e.delegateTarget.dataset.page
+            binds.aPage.bind((e) => {
+                const data = JSON.parse(e.delegateTarget.dataset.add || 'null');
+                const name = e.delegateTarget.dataset.page;
                 if (pageManager.currentContainer === name && data == null) {
                     return pageManager.close();
                 }
-                return pageManager.open(name, data)
+                return pageManager.open(name, data);
             }, 'pages.bind');
         },
         processor() {
-            this.levels = url.address.split('/')
+            this.levels = url.address.split('/');
             switch (this.levels[0]) {
-                case 'player':
-                    return pageManager.open('player')
-                case 'general':
-                default:
-                    return pageManager.open('general')
+            case 'player':
+                return pageManager.open('player');
+            case 'general':
+            default:
+                return pageManager.open('general');
             }
         },
         array: {
@@ -365,132 +440,150 @@ $(function () {
                 state: null,
                 shikimori: shikimori.animes(),
                 main() {
-                    let filters = {
-                        order: [{
-                            name: 'ID',
-                            value: 'id'
-                        }, 'ranked', 'kind', 'popularity', 'name', 'aired_on', 'episodes', 'status', 'random', ''],
-                        kind: ['tv', 'movie', 'ova', 'ona', 'special', 'music', 'tv_13', 'tv_24', 'tv_48', ''],
-                        status: ['anons', 'ongoing', 'released', '']
-                    }
-                    $('main>.vcontainer').html('')
-                    this._scrollUpdate();
+                    $('main>.vcontainer').html('');
+                    this.scrollUpdate();
                 },
                 load(page = 1) {
-                    this.state = 'loading'
-                    this.shikimori.page(page).then(r => {
-                        let results = $('.page.general div.all')
-                        if (r.length === 0) return results.append(collections.noResults('Не удалось загрузить больше.'))
-                        r.forEach(t => {
-                            results.append(collections.title(t, collections.titleExtended))
-                        })
-                        App.loaded()
-                        this.state = null
-                        binds.lazyLoad.update()
-                        binds.titleHigh.update()
-                        binds.aWindow.update()
-                        binds.titleHover.update()
-                    }, e => {
-                        $('.page.general>.vcontainer').html(collections.noResults())
-                        console.groupCollapsed('Unable to load titles')
-                        Array(...arguments).forEach(a => console.error(a))
-                        console.groupEnd()
-                    })
+                    this.state = 'loading';
+                    this.shikimori.page(page).then((r) => {
+                        const results = $('.page.general div.all');
+                        if (r.length === 0) {
+                            results.append(collections.noResults('Не удалось загрузить больше.'));
+                            return;
+                        }
+                        r.forEach((t) => {
+                            results.append(collections.title(t, collections.titleExtended));
+                        });
+                        App.loaded();
+                        this.state = null;
+                        binds.lazyLoad.update();
+                        binds.titleHigh.update();
+                        binds.aWindow.update();
+                        binds.titleHover.updateSelector();
+                    }, () => {
+                        $('.page.general>.vcontainer').html(collections.noResults());
+                    });
                 },
-                _scrollUpdate() {
-                    let pages = 1
-                    this.load(pages++)
-                    workers.console.log('Load titles in general page...')
-                    binds.bodyScroll.bind(e => {
-                        let toBottom = e.target.children[0].clientHeight - e.target.scrollTop - e.target.clientHeight
-                        if (toBottom < 500 && this.state !== 'loading') this.load(pages++)
-                    }, 'pages.general._scrollUpdate')
-                }
+                scrollUpdate() {
+                    let pageOffset = 1;
+                    this.load(pageOffset);
+                    workers.console.log('Load titles in general page...');
+                    binds.bodyScroll.bind(({ target }) => {
+                        pageOffset += 1;
+                        const toBottom = target.children[0].clientHeight
+                          - target.scrollTop
+                          - target.clientHeight;
+                        if (toBottom < 500 && this.state !== 'loading') this.load(pageOffset);
+                    }, 'pages.general._scrollUpdate');
+                },
             },
             player: {
                 _current: 'kodik',
                 _title: undefined,
                 _data: undefined,
                 _state: undefined,
-                main() {
-                    App.loaded()
-                    this.update()
+                main(data) {
+                    App.loaded();
+                    this.update(data);
                 },
                 load() {
-                    workers.kodik()
+                    workers.kodik();
                 },
-                update() {
-                    if (this._title !== pages.levels[1].toString() + pages.levels[2].toString())
-                        this.setPlayer(pages.levels[1], pages.levels[2])
+                update(data) {
+                    if (this._title !== pages.levels[1].toString() + pages.levels[2].toString()) {
+                        this.setPlayer(pages.levels[1], pages.levels[2]);
+                    }
+
+                    if (data != null && data.action === 'reload') {
+                        this.players.kodik.reload();
+                    }
                 },
                 setPlayer(name, id) {
-                    workers.console.log(`Running player - ${name}:${id}`)
-                    this._title = name.toString() + id.toString()
-                    shikimori.animes().reset().ids([Number(id)]).then(r => {
-                        this._data = r[0]
-                        App.title(`KDK - ${this._data.russian || this._data.name}`)
-                        $('.page.player .ui-bar').html(collections.playerBar(this._data))
+                    workers.console.log(`Running player - ${name}:${id}`);
+                    this._title = name.toString() + id.toString();
+                    shikimori.animes().reset().ids([Number(id)]).then((r) => {
+                        this._data = r[0];
+                        App.title(`KDK - ${this._data.russian || this._data.name}`);
+                        $('.page.player .ui-bar').html(collections.playerBar(this._data));
                         const history = workers.metric.history();
                         if (history != null) {
                             history.push({
                                 id: this._data.id,
                                 name: this._data.name,
                                 russian: this._data.russian,
-                                image: {preview: this._data.image.preview, original: this._data.image.original}
-                            })
+                                image: { preview: this._data.image.preview, original: this._data.image.original },
+                            });
                         }
                         $('header>nav>a.player-show').show()
                             .attr('title', this._data.russian || this._data.name || 'Плеер')
-                            .attr('data-add', JSON.stringify(this._data ?? '{}'));
-                        binds.aWindow.update()
-                    })
-                    $('.page.player .player-' + this._current).hide()
-                    let players = {
-                        kodik: $('.page.player .player-kodik')
-                    }
+                            .attr('data-add', JSON.stringify(this._data || '{}'));
+                        binds.aWindow.update();
+                        binds.aPage.update();
+                    });
+                    $(`.page.player .player-${this._current}`).hide();
+                    const players = {
+                        kodik: $('.page.player .player-kodik'),
+                    };
                     switch (name) {
-                        case 'animetop':
-                            break;
-                        case 'shikimori':
-                            players.kodik.show()
-                            this.players.kodik.setShikimori(id)
-                            break;
-                        case 'kodik':
-                        default:
-                            players.kodik.show()
-                            this.players.kodik.setVideo(id)
-                            break;
-
+                    case 'animetop':
+                        break;
+                    case 'shikimori':
+                        players.kodik.show();
+                        this.players.kodik.setShikimori(id);
+                        break;
+                    case 'kodik':
+                    default:
+                        players.kodik.show();
+                        this.players.kodik.setVideo(id);
+                        break;
                     }
                 },
                 players: {
                     kodik: {
                         setShikimori(id) {
-                            binds.kodikBackend.search({shikimori_id: Number(id)}).then(d => {
-                                if (d.results.length === 0) return alert('anime not found')
-                                $('.page.player .player-kodik').attr('src', d.results[0].link)
-                            })
+                            binds.kodikBackend.search({ shikimori_id: Number(id) }).then((d) => {
+                                if (d.results.length === 0) {
+                                    alert('anime not found');
+                                    pageManager.open('general');
+                                    return;
+                                }
+                                $('.page.player .player-kodik').attr('src', d.results[0].link);
+                            });
                         },
                         setVideo(id) {
-                        }
-                    }
-                }
-            }
-        }
+                        },
+                        reload() {
+                            const iframe = $('.page.player .player-kodik').get(0);
+                            iframe.src = iframe.src;
+                        },
+                    },
+                },
+            },
+        },
     };
     Object.entries(pages.array).forEach(([pageName, actions]) => {
         let isWorking = false;
         pageManager.register(pageName, `.page.${pageName}`);
-        pageManager.addEventListener(pageName, 'open', () => {
+        pageManager.addEventListener(pageName, 'open', (data) => {
             if (isWorking) {
-                pages.array[pageName].update?.();
+                if (pages.array[pageName].update != null) {
+                    pages.array[pageName].update(data);
+                }
             } else {
-                pages.array[pageName].main?.();
+                if (pages.array[pageName].main != null) {
+                    pages.array[pageName].main(data);
+                }
                 isWorking = true;
             }
+            windowManager.close();
         });
         pageManager.addEventListener(pageName, 'close', () => {
-            pages.array[pageName].unload?.();
+            if (pages.array[pageName].main == null) {
+                return;
+            }
+            if (pages.array[pageName].unload != null) {
+                pages.array[pageName].unload();
+            }
         });
     });
     $('header nav > a[data-page]').each((_, element) => {
@@ -507,76 +600,70 @@ $(function () {
         ui() {
             binds.hover.bind(function (e) {
                 $(this).css({
-                    '--x': e.offsetX + 'px',
-                    '--y': e.offsetY + 'px'
-                })
-            }, 'jq.custom')
-            pages.init()
-            pages.bind()
+                    '--x': `${e.offsetX}px`,
+                    '--y': `${e.offsetY}px`,
+                });
+            }, 'jq.custom');
+            pages.init();
+            pages.bind();
             binds.titleHigh.bind(function (e) {
                 $(this).css({
-                    "--x": e.offsetX,
-                    "--y": e.offsetY
-                })
-            }, 'worker.ui.title')
+                    '--x': e.offsetX,
+                    '--y': e.offsetY,
+                });
+            }, 'worker.ui.title');
         },
         search: {
             dom: {
-                results: $('.window.search .results')
+                results: $('.window.search .results'),
             },
             search(text) {
-                this.dom.results.html(collections.loadingResults())
-                shikimori.animes().status('').order('').search(text).then(r => {
-                    this.dom.results.html('')
-                    if (r.length === 0) $('.window.search .results').html(collections.noResults())
-                    r.forEach(t => {
-                        this.dom.results.append(collections.title(t))
-                    })
-                    binds.titleHover.update()
-                    binds.titleHigh.update()
-                    binds.lazyLoad.update()
-                    binds.aWindow.update()
-                })
-            }
-        },
-        favorite: {
-            init() {
-
-            },
-            toggle(data) {
-
+                this.dom.results.html(collections.loadingResults());
+                shikimori.animes().status('').order('').search(text)
+                    .then((r) => {
+                        this.dom.results.html('');
+                        if (r.length === 0) $('.window.search .results').html(collections.noResults());
+                        r.forEach((t) => {
+                            this.dom.results.append(collections.title(t));
+                        });
+                        binds.titleHover.updateSelector();
+                        binds.titleHigh.update();
+                        binds.lazyLoad.update();
+                        binds.aWindow.update();
+                    });
             },
         },
         clock: {
             set() {
-                let date = new Date()
-                $('.ui-clock').text((date.getHours() > 9 ? date.getHours() : '0' + date.getHours()) + ':' + (date.getMinutes() > 9 ? date.getMinutes() : '0' + date.getMinutes()))
-                window.clock = setInterval(function () {
-                    let date = new Date(),
-                        elem = $('.ui-clock'),
-                        format = (date.getHours() > 9 ? date.getHours() : '0' + date.getHours()) + ':' + (date.getMinutes() > 9 ? date.getMinutes() : '0' + date.getMinutes())
-                    if (elem.text() !== format) elem.text(format)
-                }, 1e3)
-            }
+                const date = new Date();
+                $('.ui-clock').text(`${date.getHours() > 9 ? date.getHours() : `0${date.getHours()}`}:${date.getMinutes() > 9 ? date.getMinutes() : `0${date.getMinutes()}`}`);
+                window.clock = setInterval(() => {
+                    const date = new Date();
+                    const elem = $('.ui-clock');
+                    const format = `${date.getHours() > 9 ? date.getHours() : `0${date.getHours()}`}:${date.getMinutes() > 9 ? date.getMinutes() : `0${date.getMinutes()}`}`;
+                    if (elem.text() !== format) elem.text(format);
+                }, 1e3);
+            },
         },
         hotkeys() {
-            hotkeys('esc,alt+o,alt+s,alt+c', function (e, h) {
+            hotkeys('esc,alt+o,alt+s,alt+c', (e, h) => {
                 switch (h.key) {
-                    case 'esc':
-                        if (windows.current !== null) windows.close()
-                        else pages.set('general')
-                        break;
-                    case 'alt+o':
-                        windows.open('config');
-                        break;
-                    case 'alt+s':
-                        windows.open('search');
-                        break;
-                    case 'alt+c':
-                        windows.open('console');
-                        break;
+                case 'esc':
+                    if (windows.current !== null) windowManager.close();
+                    else pageManager.open('general');
+                    break;
+                case 'alt+o':
+                    windowManager.open('config');
+                    break;
+                case 'alt+s':
+                    windowManager.open('search');
+                    break;
+                case 'alt+c':
+                    windowManager.open('console');
+                    break;
+                default: break;
                 }
-            })
+            });
         },
         metric: {
             state: () => binds.config.config.collectInformation,
@@ -584,162 +671,120 @@ $(function () {
 
             },
             history() {
-                return workers.metric.state() ? binds.sHistory : false
+                return workers.metric.state() ? binds.sHistory : false;
             },
             favorite() {
-                return workers.metric.state() ? binds.sFavorite : false
+                return workers.metric.state() ? binds.sFavorite : false;
             },
             collections() {
-                return workers.metric.state() ? binds.sCollections : false
-            }
+                return workers.metric.state() ? binds.sCollections : false;
+            },
         },
         hoverMenu() {
             let tile;
-            binds.titleHover.on('click', n => {
-                switch (Number(n)) {
-                    case 0:
-                        return url.set('#player/shikimori/' + tile.id, {})
-                    case 1:
-                        return windowManager.open('title-info', tile)
-                    case 2:
-                        return windowManager.open('collections', { title: tile });
-                    case 3:
-                        return windowManager.open('collections', { remove: tile.id });
-                    case 4:
-                        return navigator.clipboard.writeText(tile.name)
-                    case 5:
-                        return window.open(shikimori.origin + tile.url)
+            binds.titleHover.addEventListener('click', (id) => {
+                switch (Number(id)) {
+                case 0: {
+                    url.set(`#player/shikimori/${tile.id}`, {});
+                    break;
                 }
-            }).on('open', (e) => {
-                const { add = '{}' } = e.delegateTarget.dataset;
+                case 1: {
+                    windowManager.open('title-info', tile);
+                    break;
+                }
+                case 2: {
+                    windowManager.open('collections', { title: tile });
+                    break;
+                }
+                case 3: {
+                    windowManager.open('collections', { remove: tile.id });
+                    break;
+                }
+                case 4: {
+                    navigator.clipboard.writeText(tile.name);
+                    break;
+                }
+                case 5: {
+                    window.open(shikimori.origin + tile.url);
+                    break;
+                }
+                default: break;
+                }
+            });
+            binds.titleHover.addEventListener('open', (e) => {
+                const { add = '{}' } = e.currentTarget.dataset;
                 tile = JSON.parse(add);
             });
         },
-        schedule: {
-            _cache: {},
-            async animevost() {
-                let result = [[], [], [], [], [], [], []]
-                if (this._cache.animevost !== undefined)
-                    return this._cache.animevost
-                await animetop.timetable().then((r, e) => {
-                    if (e !== undefined) return err(e)
-                    r.forEach(i => {
-                        result[i.day].push({
-                            name: i.name,
-                            time: i.time,
-                            from: 'AnimeVost'
-                        })
-                    })
-                })
-                return this._cache.animevost = result
-            },
-            async anilibria() {
-                let result = [[], [], [], [], [], [], []]
-                if (this._cache.anilibria !== undefined)
-                    return this._cache.anilibria
-                await binds.anilibria.getSchedule().then((r, e) => {
-                    if (e !== undefined) return err(e)
-                    r.forEach((data, day) => {
-                        data.list.forEach(i => {
-                            result[day].push({
-                                name: i.names.ru,
-                                time: 'неизвестно',
-                                from: 'Anilibria'
-                            })
-                        })
-                    })
-                })
-                return this._cache.anilibria = result
-            },
-            _list: ['animevost', 'anilibria'],
-            all() {
-                return new Promise(res => {
-                    let results = [[], [], [], [], [], [], []]
-                    this._list.forEach((a, i) => {
-                        this[a]().then(r => {
-                            r.forEach((d, i) => {
-                                results[i] = results[i].concat(d)
-                            })
-                            if (i === this._list.length - 1)
-                                return res(results)
-                        })
-                    })
-                })
-            }
-        },
         styles() {
-            let f = () => {
-                let hd = document.querySelector('header'),
-                    cs = document.querySelector('#--headerCeilSize').offsetHeight
-                document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`)
-                hd.children[0].style.height = ((document.querySelectorAll('header>nav>a[display=true]').length + 4) * cs >= hd.offsetHeight) ? 'fit-content' : '100%'
-            }
-            window.addEventListener('resize', f)
-            readyDOM(f)
-        },
-        oldConvert: {
-            history() {
-                let list = localStorage.getItem('lsHistory')
-            }
+            const f = () => {
+                const hd = document.querySelector('header');
+                const cs = document.querySelector('#--headerCeilSize').offsetHeight;
+                document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
+                hd.children[0].style.height = ((document.querySelectorAll('header>nav>a[display=true]').length + 4) * cs >= hd.offsetHeight) ? 'fit-content' : '100%';
+            };
+            window.addEventListener('resize', f);
+            readyDOM(f);
         },
         storage: {
             init() {
-                this.size._build()
+                this.size._build();
             },
             size: {
                 _build() {
-                    Object.keys(this._old).forEach(k => this[`old${k}`] = () => this._Processor(this._old[k]))
-                    Object.keys(this._list).forEach(k => this[k] = () => this._Processor(this._list[k]))
+                    Object.keys(this._old).forEach((k) => this[`old${k}`] = () => this._Processor(this._old[k]));
+                    Object.keys(this._list).forEach((k) => this[k] = () => this._Processor(this._list[k]));
                 },
                 _Processor(name) {
-                    let list = localStorage.getItem(name)
-                    return list === null ? 0 : new Blob([list]).size
+                    const list = localStorage.getItem(name);
+                    return list === null ? 0 : new Blob([list]).size;
                 },
                 _old: {
                     Favorite: 'lsfavorite',
                     Cache: 'cache',
-                    History: 'lshistory'
+                    History: 'lshistory',
                 },
                 _list: {
                     favorite: 'sFavorite',
-                    history: 'sHistory'
+                    history: 'sHistory',
                 },
                 all() {
-                    let size = this.self()
-                    Object.values(this._old).forEach(v => size += this._Processor(v))
-                    Object.values(this.list).forEach(l => size += this._Processor(l))
-                    return size
+                    let size = this.self();
+                    Object.values(this._old).forEach((v) => size += this._Processor(v));
+                    Object.values(this.list).forEach((l) => size += this._Processor(l));
+                    return size;
                 },
                 self() {
-                    let file, size = 0
-                    App.info.sources.forEach(s => {
+                    let file; let
+                        size = 0;
+                    App.info.sources.forEach((s) => {
                         try {
-                            file = storage.get(s.name)
+                            file = storage.get(s.name);
                         } catch (e) {
-                            console.groupCollapsed('Unable to load file')
-                            console.error(e)
-                            return console.groupEnd()
+                            console.groupCollapsed('Unable to load file');
+                            console.error(e);
+                            return console.groupEnd();
                         }
-                        size += new Blob([file]).size
-                    })
-                    return size
-                }
+                        size += new Blob([file]).size;
+                    });
+                    return size;
+                },
 
             },
             _data() {
                 const data = {
-                    system: {size: this.size.self(), description: 'Файлы сайта'},
-                    oldcache: {size: this.size.oldCache(), description: 'Старые данные кэша'},
-                    oldhistory: {size: this.size.oldHistory(), description: 'Старая история просмотров'},
-                    oldfavorite: {size: this.size.oldFavorite(), description: 'Старый список любимого'},
-                    favorite: {size: this.size.favorite(), description: 'Список любимого'},
-                    history: {size: this.size.history(), description: 'История просмотров'}
+                    system: { size: this.size.self(), description: 'Файлы сайта' },
+                    oldcache: { size: this.size.oldCache(), description: 'Старые данные кэша' },
+                    oldhistory: { size: this.size.oldHistory(), description: 'Старая история просмотров' },
+                    oldfavorite: { size: this.size.oldFavorite(), description: 'Старый список любимого' },
+                    favorite: { size: this.size.favorite(), description: 'Список любимого' },
+                    history: { size: this.size.history(), description: 'История просмотров' },
                 };
                 const all = Object.values(data).reduce((a, b) => a + b.size, 0);
                 Object.values(data).forEach((value) => {
                     value.part = value.size / all;
                     value.size = this._convert(value.size);
-                })
+                });
                 return [this._convert(all), data];
             },
             _convert(bytes, digits = 2) {
@@ -749,88 +794,88 @@ $(function () {
                     [2 ** 20, 'MB'],
                     [2 ** 30, 'GB'],
                 ];
-                const [measureSize, measureUnit] = sizes.reduce((prev, curr) => {
-                    return (Math.abs(curr[0] - bytes) < Math.abs(prev[0] - bytes)) ? curr : prev;
-                })
-                return `${Math.ceil(bytes / measureSize * 10 ** digits) / 10 ** digits}${measureUnit}`;
-            }
+                const [measureSize, measureUnit] = sizes.reduce((prev, curr) => (
+                    (Math.abs(curr[0] - bytes) < Math.abs(prev[0] - bytes)) ? curr : prev));
+                const delimiter = 10 ** digits;
+                return `${Math.ceil((bytes / measureSize) * delimiter) / delimiter}${measureUnit}`;
+            },
         },
         shikimori: {
             linkTitle(kind) {
                 switch (kind) {
-                    case'wikipedia':
-                        return 'Wikipedia'
-                    case'anime_news_network':
-                        return 'Anime News Network'
-                    case'myanimelist':
-                        return 'MyAnimeList'
-                    case'anime_db':
-                        return 'AniDB'
-                    case'world_art':
-                        return 'World Art'
-                    case'twitter':
-                        return 'Twitter'
-                    case'official_site':
-                        return 'Официальный сайт'
-                    case'kage_project':
-                        return 'Kage Project'
-                    case'kinopoisk':
-                        return 'Кинопоиск'
-                    case'ruranobe':
-                        return 'РуРанобэ'
-                    case'readmanga':
-                        return 'ReadManga'
-                    case'novelupdates':
-                        return 'NovelUpdates'
-                    case'mangaupdates':
-                        return 'MangaUpdates'
-                    case'mangafox':
-                        return 'MangaFox'
-                    case'mangachan':
-                        return 'Манга-тян'
-                    case'mangahub':
-                        return 'Mangahub'
-                    case'smotret_anime':
-                        return 'Смотреть аниме'
-                    case'youtube_channel':
-                        return 'YouTube'
-                    case'novel_tl':
-                        return 'Novel.tl'
-                    case'mangalib':
-                        return 'MangaLib'
-                    case'ranobelib':
-                        return 'RanobeLib'
-                    case'remanga':
-                        return 'ReManga'
-                    case'mangadex':
-                        return 'MangaDex'
-                    case'more_tv':
-                        return 'more.tv'
-                    case'baike_baidu_wiki':
-                        return 'Baike Baidu Wiki'
-                    case'namu_wiki':
-                        return 'Namu Wiki'
+                case 'wikipedia':
+                    return 'Wikipedia';
+                case 'anime_news_network':
+                    return 'Anime News Network';
+                case 'myanimelist':
+                    return 'MyAnimeList';
+                case 'anime_db':
+                    return 'AniDB';
+                case 'world_art':
+                    return 'World Art';
+                case 'twitter':
+                    return 'Twitter';
+                case 'official_site':
+                    return 'Официальный сайт';
+                case 'kage_project':
+                    return 'Kage Project';
+                case 'kinopoisk':
+                    return 'Кинопоиск';
+                case 'ruranobe':
+                    return 'РуРанобэ';
+                case 'readmanga':
+                    return 'ReadManga';
+                case 'novelupdates':
+                    return 'NovelUpdates';
+                case 'mangaupdates':
+                    return 'MangaUpdates';
+                case 'mangafox':
+                    return 'MangaFox';
+                case 'mangachan':
+                    return 'Манга-тян';
+                case 'mangahub':
+                    return 'Mangahub';
+                case 'smotret_anime':
+                    return 'Смотреть аниме';
+                case 'youtube_channel':
+                    return 'YouTube';
+                case 'novel_tl':
+                    return 'Novel.tl';
+                case 'mangalib':
+                    return 'MangaLib';
+                case 'ranobelib':
+                    return 'RanobeLib';
+                case 'remanga':
+                    return 'ReManga';
+                case 'mangadex':
+                    return 'MangaDex';
+                case 'more_tv':
+                    return 'more.tv';
+                case 'baike_baidu_wiki':
+                    return 'Baike Baidu Wiki';
+                case 'namu_wiki':
+                    return 'Namu Wiki';
                 }
-            }
+            },
         },
         console: {
             log(text, col = '#fff') {
-                let log = $('.window.console .result')
-                log.append(collections.consoleRow(text, col))
-                $('.window.console').scrollTop(log.height())
+                const log = $('.window.console .result');
+                log.append(collections.consoleRow(text, col));
+                $('.window.console').scrollTop(log.height());
             },
             error(text) {
-                return this.log(text, '#f77')
+                return this.log(text, '#f77');
             },
             warn(text) {
-                return this.log(text, '#ff7')
-            }
+                return this.log(text, '#ff7');
+            },
         },
         kodik() {
-            binds.kodik.on('current_episode', d => {
-                pages.array.player._state = d
+            binds.kodik.on('current_episode', (d) => {
+                pages.array.player._state = d;
             }).on('time_update', (data) => {
-                let history = workers.metric.history();
+                const history = workers.metric.history();
                 const { id } = pages.array.player._data;
                 if (history == null || id == null) {
                     return false;
@@ -839,44 +884,43 @@ $(function () {
                 const item = history.get(id);
                 Object.assign(item, {
                     episodes: {
-                        ...item.episodes ?? {},
+                        ...item.episodes || {},
                         [pages.array.player._state.episode]: data,
                     },
                 });
                 history.set(id, item);
-            })
-
+            });
         },
         redirect() {
-            url.onRedirect(st => {
-                console.groupCollapsed('Redirected to #' + url.address)
-                console.log(st)
-                console.groupEnd()
-                workers.console.log('Page changed to ' + url.address)
-                pages.processor()
-            })
-        }
-    }
+            url.onRedirect((st) => {
+                console.groupCollapsed(`Redirected to #${url.address}`);
+                console.log(st);
+                console.groupEnd();
+                workers.console.log(`Page changed to ${url.address}`);
+                pages.processor();
+            });
+        },
+    };
     // config load
-    binds.config.change(config)
+    binds.config.change(config);
     // ui preload
-    workers.ui()
+    workers.ui();
     workers.styles();
-    workers.hoverMenu()
-    workers.clock.set()
+    workers.hoverMenu();
+    workers.clock.set();
     // internal init
-    workers.storage.init()
-    workers.hotkeys()
-    workers.redirect()
+    workers.storage.init();
+    workers.hotkeys();
+    workers.redirect();
     // app link
-    windows.bind()
-    App.chrome.sw()
+    windows.bind();
+    App.chrome.sw();
     //
-    window["KDK"] = {
+    window.KDK = {
         url,
     };
     // debug info
-    workers.console.log('Start loading...')
-    workers.console.log(`Current version: ${App.info.update.version}(${App.info.update.release})`)
-    console.log(`KDK Anime ${App.info.update.version}(${App.info.update.release})`)
-})
+    workers.console.log('Start loading...');
+    workers.console.log(`Current version: ${App.info.update.version}(${App.info.update.release})`);
+    console.log(`KDK Anime ${App.info.update.version}(${App.info.update.release})`);
+});

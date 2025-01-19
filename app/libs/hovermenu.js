@@ -1,83 +1,216 @@
-(function(){
-    window.hoverMenu = function(selector,menu=["none"],options={}){
-        this._keeper = {
-            open: [],
-            click: [],
-            close: []
+/* global $ */
+
+/**
+ * @typedef HoverMenuEvents {'open' | 'click' | 'close'}
+ */
+
+/**
+ * @typedef HoverMenuEventListener {(idOrEvent: number | PointerEvent) => void}
+ */
+
+/**
+ * @typedef HoverMenuItem {{
+ *   text: string,
+ *   classes?: string[]
+ *   style?: CSSProperties,
+ *   action?: boolean,
+ * }}
+ */
+
+/**
+ * @typedef HoverMenuOptions {{
+ *   style: CSSProperties,
+ *   classes: string[]
+ * }}
+ */
+
+/* eslint-disable-next-line no-unused-vars */
+class HoverMenu {
+    /**
+     * @param selector {string}
+     * @param menu {(string | HoverMenuItem)[]}
+     * @param [options] {Partial<HoverMenuOptions>}
+     */
+    constructor(selector, menu, options = {}) {
+        this.isOpen = false;
+        /** @type {Record<HoverMenuEvents, Set<HoverMenuEventListener> | undefined>}  */
+        this.listeners = {};
+        this.rootSelector = selector;
+        this.menuElement = HoverMenu.createMenu();
+        this.outsideController = new AbortController();
+        this.rootController = new AbortController();
+        this.items = menu.map((item, index) => {
+            const element = HoverMenu.createMenuItem(item);
+            this.attachItemListener(element, item, index);
+
+            this.menuElement.append(element);
+            return element;
+        });
+
+        if (options.style != null) {
+            Object.assign(this.menuElement, options.style);
         }
-        this.state = false
-        this.selector = selector
-        this._hBind()
-        this.name = `hoverMenu-${(new Date()).getTime()}`
-        $('body').append(`<ul id="${this.name}"></ul>`)
-        this.ROOT = $(`#${this.name}`).css({
-            position: 'fixed',
-            'z-index': '999'
-        }).hide()
-        options.style&&this.ROOT.css(options.style)
-        options.classes&&options.classes.forEach(c=>this.ROOT.addClass(c))
-        this.menuParser(menu)
-    }
-    window.hoverMenu.prototype = {
-        on(event,handler){
-            if(Object.keys(this._keeper).indexOf(event) === -1) throw 'Invalid event name'
-            if(typeof handler !== 'function') throw 'Handler must be a function'
-            return this._keeper[event].push(handler), this
-        },
-        unbind(event){
-            if(Object.keys(this._keeper).indexOf(event) === -1) throw 'Invalid event name'
-            return this._keeper[event]=[],this
-        },
-        update(){
-            return $(this.selector).unbind('contextmenu').on('contextmenu',e=>{
-                const menuWidth = this.ROOT.width();
-                const menuHeight = this.ROOT.height();
-                const pageWidth = $(document).width();
-                const pageHeight = $(document).height();
-                this.open(
-                    Math.min(e.pageX, pageWidth - menuWidth - 16),
-                    Math.min(e.pageY, pageHeight - menuHeight - 16),
-                );
-                this._call(this._keeper.open,[e])
-                return e.preventDefault(), false
-            }), this
-        },
-        _hBind(){
-            this.update()
-            $('body').click(e=>{
-                let target = $(e.target)
-                if(target.parent(`#${this.name}`).length>0){
-                    let li = target
-                    if(target.parent('li').parent(`#${this.name}`).length>0) li = target.parent('li')
-                    this._call(this._keeper.click,[li.attr('data-id'),li])
-                    if(li.is('[stay]')) return true
-                }
-                this.state&&this.close()
-            })
-        },
-        _call(array,args){
-            if(typeof array !== 'object') throw 'Invalid type of array'
-            Object.values(array).length>0&&array.forEach(f=>f(...args))
-        },
-        menuParser(menu){
-            if(typeof menu !== 'object') throw 'Invalid type of menu'
-            this.ROOT.html('')
-            Object.values(menu).forEach((i,n)=>{
-                if(typeof i === 'string') return this.ROOT.append(`<li data-id="${n}">${i}</li>`);
-                this.ROOT.append(`<li data-id="${n}">${i.text}</li>`)
-                let selector = this.ROOT.children(`li[data-id=${n}]`)
-                i.action&&selector.attr('stay','')
-                i.classes&&i.classes.forEach(c=>selector.addClass(c))
-                i.style&&selector.css(i.style)
-            })
-        },
-        open(x,y){
-            this.state = true
-            return this.ROOT.offset({left:x,top:y}).show(), this
-        },
-        close(){
-            this.state = false
-            return this.ROOT.offset({top:0,left:0}).hide(), this
+        if (options.classes != null) {
+            this.menuElement.classList.add(...options.classes);
         }
+
+        this.resizeListener();
+        this.resizeObserver = new ResizeObserver(() => this.resizeListener());
+        this.resizeObserver.observe(this.menuElement);
+        this.resizeObserver.observe(document.body);
+        this.outsideClickListener();
+        this.updateSelector();
+        document.body.append(this.menuElement);
+        $(this.menuElement).hide();
     }
-})()
+
+    /**
+     * @param eventName {HoverMenuEvents}
+     * @param callback {HoverMenuEventListener}
+     */
+    addEventListener(eventName, callback) {
+        if (this.listeners[eventName] === undefined) {
+            this.listeners[eventName] = new Set();
+        }
+
+        this.listeners[eventName].add(callback);
+    }
+
+    /**
+     * @param eventName {HoverMenuEvents}
+     * @param [callback] {HoverMenuEventListener}
+     */
+    removeEventListener(eventName, callback) {
+        if (this.listeners[eventName] === undefined) {
+            return;
+        }
+
+        if (callback == null) {
+            this.listeners[eventName].delete(callback);
+            return;
+        }
+
+        this.listeners[eventName].clear();
+    }
+
+    /**
+     * @param eventName {HoverMenuEvents}
+     * @param listenerArgs {Parameters<HoverMenuEventListener>}
+     */
+    fireEvent(eventName, ...listenerArgs) {
+        const listeners = this.listeners[eventName];
+
+        if (listeners == null) {
+            return;
+        }
+
+        listeners.forEach((listener) => {
+            listener(...listenerArgs);
+        });
+    }
+
+    /**
+     * @param event {MouseEvent}
+     */
+    open(event) {
+        this.isOpen = true;
+        this.updateMenuPosition(event.clientX, event.clientY);
+        $(this.menuElement).show();
+        this.fireEvent('open', event);
+    }
+
+    close() {
+        this.isOpen = false;
+        $(this.menuElement).hide();
+        this.fireEvent('close');
+    }
+
+    /**
+     * @returns {[[number, number], [number, number]]}
+     */
+    calcMenuBoundaries() {
+        const menuWidth = $(this.menuElement).width();
+        const menuHeight = $(this.menuElement).height();
+        const windowWidth = $(document.body).width();
+        const windowHeight = $(document.body).height();
+
+        return [
+            [0, windowWidth - menuWidth - 16],
+            [0, windowHeight - menuHeight - 16],
+        ];
+    }
+
+    resizeListener() {
+        this.boundaries = this.calcMenuBoundaries();
+        this.updateMenuPosition();
+    }
+
+    updateMenuPosition(x, y) {
+        const { left, top } = $(this.menuElement).offset();
+
+        $(this.menuElement).offset({
+            left: window.utils.numberInRange(x != null ? x : left, ...this.boundaries[0]),
+            top: window.utils.numberInRange(y != null ? y : top, ...this.boundaries[1]),
+        });
+    }
+
+    /**
+     * @param element {HTMLLIElement}
+     * @param item {HoverMenuItem}
+     * @param id {number}
+     */
+    attachItemListener(element, item, id) {
+        element.addEventListener('click', () => {
+            this.fireEvent('click', id);
+            if (!item.action) {
+                this.close();
+            }
+        });
+    }
+
+    updateSelector() {
+        this.rootController.abort('Re-bind listeners');
+        this.rootController = new AbortController();
+        document.querySelectorAll(this.rootSelector).forEach((element) => {
+            element.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+                this.open(e);
+                return false;
+            }, { signal: this.rootController.signal });
+        });
+    }
+
+    outsideClickListener() {
+        this.outsideController.abort('Re-bind listeners');
+        this.outsideController = new AbortController();
+        document.body.addEventListener('click', () => {
+            this.close();
+        }, { signal: this.outsideController.signal });
+        this.menuElement.addEventListener('click', (e) => {
+            e.stopPropagation();
+        }, { signal: this.outsideController.signal });
+    }
+
+    static createMenu() {
+        const ulElement = document.createElement('ul');
+        ulElement.classList.add('ui-hovermenu');
+        ulElement.id = `hover-menu__${Date.now()}`;
+
+        return ulElement;
+    }
+
+    /**
+     * @param desc {string | HoverMenuItem}
+     */
+    static createMenuItem(desc) {
+        /** @type {HoverMenuItem} */
+        const item = typeof desc === 'string' ? { text: desc } : desc;
+        const liElement = document.createElement('li');
+        liElement.innerHTML = item.text;
+        if (item.classes != null) {
+            liElement.classList.add(...item.classes);
+        }
+
+        return liElement;
+    }
+}

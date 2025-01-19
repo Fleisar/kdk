@@ -1,3 +1,5 @@
+/* global $ */
+
 /**
  * @typedef {'open' | 'close' | string} ContainerEvent
  */
@@ -10,33 +12,27 @@
  * @typedef {{
  *     name: string;
  *     element: JQuery<HTMLElement>;
- *     listeners: Record<ContainerEvent, Set<ContainerListener>>;
+ *     listeners: Record<ContainerEvent, Set<ContainerListener> | undefined>;
  * }} ContainerType
  */
 
+/* eslint-disable-next-line no-unused-vars */
 class ContainerManager {
-    /** @type {JQuery<HTMLElement>} */
-    #rootElement;
-
-    /** @type {boolean} */
-    #rootOpened = false;
-
-    /** @type {boolean} */
-    #alwaysOpen = false;
-
-    /** @type {ContainerType | null} */
-    #currentContainer = null;
-
-    /** @type {Map<string, ContainerType>} */
-    #containers = new Map();
-
     constructor(selector, alwaysOpen = false) {
-        this.#rootElement = $(selector);
-        this.#alwaysOpen = alwaysOpen;
+        this.rootElement = $(selector);
+        this.alwaysOpen = alwaysOpen;
+        /** @type {ContainerType | null} */
+        this.container = null;
+        /** @type {Map<string, ContainerType>} */
+        this.containers = new Map();
     }
 
     get currentContainer() {
-        return this.#currentContainer?.name;
+        if (this.container == null) {
+            return null;
+        }
+
+        return this.container.name;
     }
 
     /**
@@ -44,7 +40,7 @@ class ContainerManager {
      * @return ContainerType
      */
     get(name) {
-        const container = this.#containers.get(name);
+        const container = this.containers.get(name);
         if (container == null) {
             throw new ReferenceError(`Container with name "${name}" does not exist`);
         }
@@ -56,7 +52,7 @@ class ContainerManager {
      * @param selector {string}
      */
     register(name, selector) {
-        if (name in this.#containers) {
+        if (name in this.containers) {
             throw new Error(`Container with name "${name}" already exists`);
         }
 
@@ -66,10 +62,10 @@ class ContainerManager {
             throw new ReferenceError(`Element with selector "${name}" does not exist or more than one`);
         }
 
-        this.#containers.set(name, {
+        this.containers.set(name, {
             name,
             element,
-            listeners: {},
+            listeners: Object(),
         });
     }
 
@@ -79,14 +75,14 @@ class ContainerManager {
      */
     open(name, data) {
         const container = this.get(name);
-        if (this.#currentContainer != null) {
+        if (this.container != null) {
             this.close(undefined, false);
         } else {
-            this.#openRootDOM();
+            this.openRootDOM();
         }
-        this.#openContainerDOM(container);
-        this.#currentContainer = container;
-        this.#fireEvent(container, 'open', data);
+        ContainerManager.openContainerDOM(container);
+        this.container = container;
+        ContainerManager.genericFireEvent(container, 'open', data);
     }
 
     /**
@@ -94,14 +90,13 @@ class ContainerManager {
      * @param closeContainer {boolean}
      */
     close(data, closeContainer = true) {
-        if (this.#currentContainer != null) {
-            this.#closeContainerDOM(this.#currentContainer);
-            this.#fireEvent(this.#currentContainer, 'close', data);
-            this.#currentContainer = null;
+        if (this.container != null) {
+            ContainerManager.closeContainerDOM(this.container);
+            ContainerManager.genericFireEvent(this.container, 'close', data);
+            this.container = null;
         }
-        if (closeContainer && !this.#alwaysOpen) {
-            this.#closeRootDOM();
-            this.#rootOpened = false;
+        if (closeContainer && !this.alwaysOpen) {
+            this.closeRootDOM();
         }
     }
 
@@ -140,7 +135,7 @@ class ContainerManager {
      */
     fireEvent(name, eventType, data) {
         const container = this.get(name);
-        return this.#fireEvent(container, eventType, data);
+        return ContainerManager.genericFireEvent(container, eventType, data);
     }
 
     /**
@@ -148,8 +143,8 @@ class ContainerManager {
      * @param eventType {ContainerEvent}
      * @param [data] {any}
      */
-    #fireEvent(container, eventType, data) {
-        const listeners = container.listeners[eventType] ?? new Set();
+    static genericFireEvent(container, eventType, data) {
+        const listeners = container.listeners[eventType] || new Set();
 
         listeners.forEach((listener) => {
             listener(data);
@@ -159,22 +154,22 @@ class ContainerManager {
     /**
      * @param container {ContainerType}
      */
-    #openContainerDOM(container) {
+    static openContainerDOM(container) {
         container.element.addClass('active');
     }
 
     /**
      * @param container {ContainerType}
      */
-    #closeContainerDOM(container) {
+    static closeContainerDOM(container) {
         container.element.removeClass('active');
     }
 
-    #openRootDOM() {
-        this.#rootElement.addClass('use');
+    openRootDOM() {
+        this.rootElement.addClass('use');
     }
 
-    #closeRootDOM() {
-        this.#rootElement.removeClass('use');
+    closeRootDOM() {
+        this.rootElement.removeClass('use');
     }
 }

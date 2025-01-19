@@ -1,10 +1,5 @@
 class Template {
     /**
-     * @type {HTMLTemplateElement}
-     */
-    #template;
-
-    /**
      * @param templateName {string}
      */
     constructor(templateName) {
@@ -12,7 +7,7 @@ class Template {
         if (template == null) {
             throw new ReferenceError(`Template ${templateName} not found`);
         }
-        this.#template = template;
+        this.template = template;
     }
 
     /**
@@ -22,7 +17,7 @@ class Template {
         if (typeof data !== 'object') {
             throw new SyntaxError('Data must be an object');
         }
-        const copy = this.#template.cloneNode(true);
+        const copy = this.template.cloneNode(true);
         const { innerHTML } = copy;
         copy.innerHTML = innerHTML.replaceAll(
             /%([A-Za-z0-9-_]{1,})/g,

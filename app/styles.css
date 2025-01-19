@@ -267,7 +267,7 @@ div.windows > .main-window > div.window {
   position: absolute;
   pointer-events: none;
   background-color: rgb(var(--colorBackground));
-  padding: max(min(5vh, 5vw), 1em);
+  padding: 2em;
   height: 100%;
   width: 100%;
   overflow-x: hidden;
@@ -474,10 +474,10 @@ footer {
 }
 .ui-sticky-win {
   position: sticky;
-  margin-top: calc(0px - max(min(5vh, 5vw), 1em));
-  padding-top: max(min(5vh, 5vw), 1em);
+  margin-top: -2em;
+  padding-top: 2em;
   padding-bottom: 0.5em;
-  top: calc(0px - max(min(5vh, 5vw), 1em));
+  top: -2em;
   z-index: 2;
   background-color: rgb(var(--colorBackground));
 }
@@ -625,6 +625,9 @@ footer {
   background-color: rgb(var(--colorFill));
 }
 .ui-hovermenu {
+  position: fixed;
+  z-index: 999;
+  box-sizing: border-box;
   box-shadow: 0 4px 10px -2px #000;
 }
 .ui-table-v td {
