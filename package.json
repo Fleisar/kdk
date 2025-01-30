@@ -4,7 +4,8 @@
   "description": "KDK Anime",
   "main": "index.html",
   "scripts": {
-    "start": "serve .",
+    "scripts:buildPWA": "pwa-assets-generator",
+    "start": "vite",
     "lint": "eslint .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -21,11 +22,20 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
     "@eslint/js": "^9.17.0",
+    "@types/jquery": "^3.5.32",
+    "@vite-pwa/assets-generator": "^0.2.6",
     "eslint": "^8.57.1",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.31.0",
     "globals": "^15.14.0",
     "sass": "^1.82.0",
-    "serve": "^14.2.4"
+    "serve": "^14.2.4",
+    "typescript": "^5.7.3",
+    "vite": "^6.0.7",
+    "vite-plugin-pwa": "^0.21.1"
+  },
+  "dependencies": {
+    "hotkeys-js": "^3.13.9",
+    "vanilla-lazyload": "^19.1.3"
   }
 }

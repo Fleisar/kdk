@@ -1,0 +1,84 @@
+@media (max-width: 719px) {
+	@import "mobile";
+	body[highEffects=true] {
+		div.windows {
+			backdrop-filter: blur(50px) contrast(2) brightness(0.8);
+
+			& > .main-window {
+				width: var(--pageWidth);
+				transform: perspective(300px) scale(0.9);
+				position: initial;
+				margin: auto;
+			}
+		}
+	}
+}
+
+@media (min-width: 720px) {
+	body[highEffects=true] {
+		header {
+			transform: translateX(calc(var(--headerWidth) * -1 + 5px));
+			opacity: 0.5;
+			transition: var(--animationUI) calc(var(--animationUI) * 5);
+
+			&:hover {
+				transition: var(--animationUI);
+				transform: perspective(300px) rotateY(0) scale(0.95) translateX(10px);
+				opacity: 1;
+			}
+		}
+
+		.windows {
+			width: 100vw;
+			backdrop-filter: blur(100px) contrast(2) brightness(0.8);
+			animation: 0.1s windows-high-effects infinite linear;
+			left: 0;
+
+			& > .main-window {
+				left: var(--pageLeft);
+				transform: perspective(300px) rotateY(4deg) scale(0.9) translateY(5px);
+				animation: 3s windows-breathing infinite ease-in-out alternate-reverse;
+			}
+
+			& > .context-window > .context {
+				animation: 2.5s context-breathing infinite ease-in-out alternate-reverse;
+			}
+		}
+	}
+}
+
+@media (max-width: 1700px) {
+	body {
+		--generalRowCount: 6
+	}
+}
+
+@media (max-width: 1450px) {
+	body {
+		--generalRowCount: 5
+	}
+}
+
+@media (max-width: 1250px) {
+	body {
+		--generalRowCount: 4
+	}
+}
+
+@media (max-width: 1000px) {
+	body {
+		--generalRowCount: 3
+	}
+}
+
+@media (max-width: 760px) {
+	body {
+		--generalRowCount: 2
+	}
+}
+
+@media (max-width: 480px) {
+	body {
+		--generalRowCount: 1
+	}
+}
