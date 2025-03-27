@@ -1,5 +1,6 @@
 /* API docs (official): https://shikimori.one/api/doc/1.0 */
 
+// eslint-disable-next-line max-classes-per-file
 const shikimori = {
     origin: 'https://shikimori.one',
     apiEndpoint: 'https://shikimori.one/api',
@@ -36,7 +37,7 @@ class Anime {
     topics() { this.request = '/topics'; }
 
     then(callback, onError = callback) {
-        return fetch(`${shikimori.api}/animes/${this.id}${this.request}`).then((r, e) => {
+        return fetch(`${shikimori.apiEndpoint}/animes/${this.id}${this.request}`).then((r, e) => {
             if (e || r.ok !== true) {
                 onError(r, e);
                 return Promise.reject(e);

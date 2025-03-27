@@ -266,7 +266,9 @@ $(() => {
                 $('.windows .window.title-info .ui-grid').html(collections.titleInfo(title));
                 const timeline = $('.window.title-info .ui-material-list.timeline');
                 const links = $('.window.title-info .ui-material-list.links');
-                shikimori.anime(title.id).franchise().then((r) => {
+                const anime = shikimori.anime(title.id);
+                anime.franchise();
+                anime.then((r) => {
                     timeline.html('');
                     r.nodes.forEach((n) => {
                         timeline.append(collections.materialItem(n.name, {
@@ -277,7 +279,8 @@ $(() => {
                     });
                     binds.aPage.update();
                 });
-                shikimori.anime(title.id).external_links().then((r) => {
+                anime.external_links();
+                anime.then((r) => {
                     links.html('');
                     r.forEach((l) => {
                         const kind = workers.shikimori.linkTitle(l.kind);

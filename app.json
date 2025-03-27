@@ -9,9 +9,9 @@
   },
   "loadType": "self",
   "update": {
-    "release": 109,
+    "release": 110,
     "type": "release",
-    "version": "3.2.1 stable",
+    "version": "3.2.2 stable",
     "description": "Добавлены коллекции. Создавайте собственные коллекции, добавляйте и категоризируйте тайтлы."
   },
   "update_policy": "auto",

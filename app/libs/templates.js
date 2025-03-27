@@ -22,13 +22,14 @@ class Template {
         copy.innerHTML = innerHTML.replaceAll(
             /%([A-Za-z0-9-_]{1,})/g,
             (str, key) => {
-                const replaced = data[key];
+                let replaced = data[key];
                 if (replaced === undefined) {
                     return str;
                 }
-                return typeof replaced === 'object'
-                    ? JSON.stringify(replaced).replaceAll('"', '&quot;')
-                    : replaced;
+                if (typeof replaced === 'object') {
+                    replaced = JSON.stringify(replaced);
+                }
+                return replaced.toString().replaceAll('"', '&quot;');
             },
         );
         return copy.content;
