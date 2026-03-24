@@ -121,7 +121,7 @@
             animes_studios: 'object',
             anime_licensed_by: 'object',
         },
-        pool: 'https://kodikapi.com',
+        pool: 'https://kodik-api.com',
         _request(method, args) {
             args = { ...args, token: this.token };
             return new Promise((r, e) => {
