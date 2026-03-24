@@ -9,10 +9,10 @@
   },
   "loadType": "self",
   "update": {
-    "release": 110,
+    "release": 111,
     "type": "release",
-    "version": "3.2.2 stable",
-    "description": "Добавлены коллекции. Создавайте собственные коллекции, добавляйте и категоризируйте тайтлы."
+    "version": "3.2.3 stable",
+    "description": "Восстановлена работа плеера"
   },
   "update_policy": "auto",
   "sources": [
